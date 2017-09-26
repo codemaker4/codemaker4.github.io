@@ -23,9 +23,18 @@ footer {
     bottom: 0px;
     left: 5%;
   width: 90%;
-  border: grey;
+  border-style: solid;
+  border-color: grey;
   border-width: 5px;
   border-bottom-width: 0px;
   border-radius: 15px 15px 0px 0px;
-  background-color: #554EAE
+  background-color: #554EAE;
+}
+.footerP {
+  float: left;
+  clear: left;
+}
+.footerLogo {
+  width: 60px;
+  height: 60px;
 }
