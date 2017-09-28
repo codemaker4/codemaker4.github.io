@@ -23,7 +23,7 @@ header {
 nav {
   float: left;
   clear: left;
-  width: 18%;
+  padding-right: 10px;
   border-style: solid;
   border-color: grey;
   border-width: 5px;
@@ -32,17 +32,30 @@ nav {
   background-color: #6CA5A5;
 }
 .bigSection {
-  float: left;
+  float: right;
   border-style: solid;
   border-color: grey;
   border-width: 5px;
   border-radius: 15px;
+  background-color: #6CA5A5;
+  padding: 10px;
+}
+.sectionTitle {
+  margin: -0.5px;
+  float: left;
+  clear: both;
+  border-style: solid;
+  border-color: grey;
+  border-width: 5px;
+  font-size: 15px;
+  background-color: #6CA5A5;
 }
 
 footer {
   float: left;
   clear: left;
   margin: 0px;
+  margin-top: 5px;
   margin-bottom: 5px;
   width: 100%;
   border-style: solid;
