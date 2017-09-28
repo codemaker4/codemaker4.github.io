@@ -3,7 +3,7 @@ body {
 }
 header {
   position:
-    fixed;
+    absolute;
     top: 0px;
     left: 5%;
   width: 90%;
@@ -19,7 +19,7 @@ header {
 }
 footer {
   position:
-    fixed;
+    absolute;
     bottom: 0px;
     left: 5%;
   width: 90%;
