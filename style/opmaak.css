@@ -2,21 +2,34 @@ body {
   background-color: white;
 }
 header {
-  position:
-    absolute;
-    top: 0px;
-    left: 5%;
+  float: left;
+  margin-left: 5%;
   width: 90%;
   border-style: solid;
   border-color: grey;
   border-width: 5px;
   border-top-width: 0px;
   border-radius: 0px 0px 15px 15px;
-  background-color: #554EAE;
+  background-color: #6CA5A5;
 }
 .headerP {
+  margin: 20px;
   font-size: 20px;
+  float: left;
+  clear: left;
 }
+
+nav {
+  float: left;
+  clear: left;
+  width: 18%;
+  border-style: solid;
+  border-color: grey;
+  border-width: 5px;
+  border-left-width: 0px;
+  border-radius: 0px 15px 15px 0px;
+}
+
 footer {
   position:
     absolute;
@@ -28,11 +41,12 @@ footer {
   border-width: 5px;
   border-bottom-width: 0px;
   border-radius: 15px 15px 0px 0px;
-  background-color: #554EAE;
+  background-color: #6CA5A5;
 }
 .footerP {
   float: left;
   clear: left;
+  margin: 10px;
 }
 .footerLogo {
   width: 60px;
