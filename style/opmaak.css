@@ -1,14 +1,15 @@
 body {
   background-color: white;
+  margin: 0px;
 }
 header {
   float: left;
-  margin-left: 5%;
-  width: 90%;
+  margin: 0px;
+  margin-bottom: 5px;
+  width: 100%;
   border-style: solid;
   border-color: grey;
-  border-width: 5px;
-  border-top-width: 0px;
+  border-width: 0px;
   border-radius: 0px 0px 15px 15px;
   background-color: #6CA5A5;
 }
@@ -28,6 +29,7 @@ nav {
   border-width: 5px;
   border-left-width: 0px;
   border-radius: 0px 15px 15px 0px;
+  background-color: #6CA5A5;
 }
 
 footer {
@@ -49,6 +51,6 @@ footer {
   margin: 10px;
 }
 .footerLogo {
-  width: 60px;
   height: 60px;
+  float: left;
 }
