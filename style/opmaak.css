@@ -31,17 +31,23 @@ nav {
   border-radius: 0px 15px 15px 0px;
   background-color: #6CA5A5;
 }
-
-footer {
-  position:
-    absolute;
-    bottom: 0px;
-    left: 5%;
-  width: 90%;
+.bigSection {
+  float: left;
   border-style: solid;
   border-color: grey;
   border-width: 5px;
-  border-bottom-width: 0px;
+  border-radius: 15px;
+}
+
+footer {
+  float: left;
+  clear: left;
+  margin: 0px;
+  margin-bottom: 5px;
+  width: 100%;
+  border-style: solid;
+  border-color: grey;
+  border-width: 0px;
   border-radius: 15px 15px 0px 0px;
   background-color: #6CA5A5;
 }
