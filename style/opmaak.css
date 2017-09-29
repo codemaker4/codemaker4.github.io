@@ -1,6 +1,7 @@
 body {
   background-color: white;
   margin: 0px;
+  padding: 0px;
 }
 header {
   float: left;
@@ -23,6 +24,8 @@ header {
 nav {
   float: left;
   clear: left;
+  margin: 5px;
+  margin-left: 0px;
   padding-right: 10px;
   border-style: solid;
   border-color: grey;
@@ -33,6 +36,7 @@ nav {
 }
 .bigSection {
   float: right;
+  margin: 5px;
   border-style: solid;
   border-color: grey;
   border-width: 5px;
@@ -46,6 +50,7 @@ nav {
   float: left;
   clear: both;
   border-style: solid;
+  border-radius: 15px;
   border-color: grey;
   border-width: 5px;
   background-color: #6CA5A5;
@@ -53,11 +58,11 @@ nav {
 .sectionItem {
   float: left;
   padding: 5px;
+  margin: 5px;
   border-color: grey;
   border-style: solid;
   border-width: 5px;
   border-radius: 15px;
-  font-size: 15px;
   background-color: #6CA5A5;
 }
 footer {
@@ -65,7 +70,6 @@ footer {
   clear: left;
   margin: 0px;
   margin-top: 5px;
-  margin-bottom: 5px;
   width: 100%;
   border-style: solid;
   border-color: grey;
