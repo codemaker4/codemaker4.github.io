@@ -38,7 +38,7 @@ function MoveCamera() {
 }
 
 function nieuw() {
-  bal = new Bal(ballen[biggestBall()].xPos,ballen[biggestBall()].yPos + Math.floor((Math.random() * 400) + 100),2,5,0,false,Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255));
+  bal = new Bal(ballen[biggestBall()].xPos,ballen[biggestBall()].yPos + Math.floor((Math.random() * 400) + 100),2,ballen[biggestBall()].xSpeed + 5,ballen[biggestBall()].ySpeed,false,Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255));
   ballen.push(bal);
 }
 
