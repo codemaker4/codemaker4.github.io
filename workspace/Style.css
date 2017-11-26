@@ -1,0 +1,52 @@
+body {
+  background-color: #421818;
+  
+}
+
+H1 {
+    color: white;
+}
+a {
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+}
+
+ul {
+    list-style-type: none;
+}
+a:hover{
+    transition:0.5s;
+    color: #E40000;
+    text-decoration:underline;
+    font-size:30px;
+}
+
+.menuitem {
+    float: right;
+    width: 23.1%;
+}
+
+.index {
+    text-align: center;
+}
+
+p {
+    color:white;
+    
+}
+
+li {
+    color: white;
+    font-size:20px;
+}
+
+.map{
+    width: 73%;
+}
+
+.copyright {
+    color:white;
+    text-align: left;
+    margin-top: 35%
+}
