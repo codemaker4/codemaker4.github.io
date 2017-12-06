@@ -1,9 +1,11 @@
-var xScreenSize = innerWidth - 4;
+var xScreenSize = innerWidth - 0;
 var yScreenSize = innerHeight - 4;
 var cameraX = 0;
 var cameraY = 0;
 var bal;
 var ballen = [];
+var reload = 0;
+var counter = 0;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
@@ -33,13 +35,13 @@ function biggestBall() {
 }
 
 function MoveCamera() {
-  cameraX = ballen[biggestBall()].xPos - (xScreenSize / 2);
-  cameraY = ballen[biggestBall()].yPos - (yScreenSize / 2);
+  cameraX = ballen[0].xPos - (xScreenSize / 2);
+  cameraY = ballen[0].yPos - (yScreenSize / 2);
 }
 
 function nieuw() {
-  bal = new Bal(ballen[biggestBall()].xPos,ballen[biggestBall()].yPos + Math.floor((Math.random() * 400) + 100),2,ballen[biggestBall()].xSpeed + 5,ballen[biggestBall()].ySpeed,false,Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255));
-  ballen.push(bal);
+  var arandom = Math.floor(Math.random() * 360);
+  ballen[ballen.length] = new Bal(Math.sin(arandom) * (100 + Math.floor(Math.random() * 200)), Math.cos(arandom) * (100 + Math.floor(Math.random() * 200)), 2, Math.sin(arandom + 90) * 3, Math.cos(arandom + 90) * 3, false, Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255));
 }
 
 function Bal(X, Y, R, XS, YS, FP, RC, GC, BC) {
@@ -72,12 +74,12 @@ function Bal(X, Y, R, XS, YS, FP, RC, GC, BC) {
           if (Math.sqrt(dx*dx + dy*dy) <= this.radius + ballen[b].radius){
             this.xSpeed = (this.xSpeed + ballen[b].xSpeed) / 2;
             this.ySpeed = (this.ySpeed + ballen[b].ySpeed) / 2;
-            this.radius += ballen[b].radius;
-            this.red = ((this.red * this.radius) + (ballen[b].red * ballen[b].radius)) / (this.radius + ballen[b].radius);
-            this.green = ((this.green * this.radius) + (ballen[b].green * ballen[b].radius)) / (this.radius + ballen[b].radius);
-            this.blue = ((this.blue * this.radius) + (ballen[b].blue * ballen[b].radius)) / (this.radius + ballen[b].radius);
+            this.radius += 0; //ballen[b].radius;
+            this.red = this.red //((this.red * this.radius) + (ballen[b].red * ballen[b].radius)) / (this.radius + ballen[b].radius);
+            this.green = this.green//((this.green * this.radius) + (ballen[b].green * ballen[b].radius)) / (this.radius + ballen[b].radius);
+            this.blue = this.blue//((this.blue * this.radius) + (ballen[b].blue * ballen[b].radius)) / (this.radius + ballen[b].radius);
             ballen.splice(b, 1);
-//            nieuw();
+            nieuw();
           } else if (Math.sqrt(dx*dx + dy*dy) < 1000) {
             this.xSpeed += dx / (Math.sqrt(dx*dx + dy*dy) / (ballen[b].radius / 100));
             this.ySpeed += dy / (Math.sqrt(dx*dx + dy*dy) / (ballen[b].radius / 100));
@@ -90,13 +92,15 @@ function Bal(X, Y, R, XS, YS, FP, RC, GC, BC) {
 
   this.beweeg = function(){
     if (this.isFixed != true) {
-      this.xPos += this.xSpeed;
-      this.yPos += this.ySpeed;
+      this.xPos += this.xSpeed / 5;
+      this.yPos += this.ySpeed / 5;
     }
   }
 }
 
-ballen = [new Bal(0,0,10,0,0,false,255,255,100)]
+ballen = [new Bal(0,0,10,0,0,true,255,255,100)]
+
+
 
 //var a = 0;
 //while (a < 100) {
@@ -106,25 +110,36 @@ ballen = [new Bal(0,0,10,0,0,false,255,255,100)]
 
 stars = []
 var a = 0;
-while (a < 100) {
+while (a < 10) {
   stars[a] = [Math.floor(Math.random() * xScreenSize), Math.floor(Math.random() * yScreenSize)];
   a += 1;
 }
 
+nieuw();
+nieuw();
+nieuw();
+
 function draw() {
-  background(0,0,100);
+  background(0,0,100,25);
   MoveCamera();
   stroke(255,255,100);
+  if (keyIsDown(32) && reload <= 0) { //keyIsDown(32)
+    nieuw();
+    reload = 50;
+  }
+  stars[counter % 100] = [Math.floor(Math.random() * xScreenSize), Math.floor(Math.random() * yScreenSize)];
   var a = 0;
   while (a < stars.length) {
     point(mod((stars[a][0] - cameraX), xScreenSize), mod((stars[a][1] - cameraY), yScreenSize));
     a += 1;
   }
   noStroke();
-  var a = 0;
-  while (a < ballen.length) {
-    ballen[a].updateSnelheid(a);
-    a += 1;
+  if (counter % 5 == 0) {
+    var a = 0;
+    while (a < ballen.length) {
+      ballen[a].updateSnelheid(a);
+      a += 1;
+    }
   }
   var a = 0;
   while (a < ballen.length) {
@@ -132,4 +147,6 @@ function draw() {
     ballen[a].teken();
     a += 1;
   }
+  reload += -1;
+  counter += 1;
 }
