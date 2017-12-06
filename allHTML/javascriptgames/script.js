@@ -1,5 +1,5 @@
 var xScreenSize = innerWidth - 0;
-var yScreenSize = innerHeight - 4;
+var yScreenSize = innerHeight - 10;
 var cameraX = 0;
 var cameraY = 0;
 var bal;
