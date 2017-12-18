@@ -53,6 +53,14 @@ if (typeof(Storage) !== "undefined") {
 } else {
     Console.log("Can not store to localStorage");
 }
+
+var eerder = localStorage.getItem("eerder");
+if (eerder != "ja"){
+  localStorage.setItem("eerder", "ja");
+  localStorage.setItem("H_score", 0);
+}
+Hscore = localStorage.getItem("H_score");
+
 function setup() {
   // create random walls
   for (j = 0; j < aantal_muren; j++){
@@ -335,7 +343,7 @@ function restart() {
   explosionSound.volume = 1;
   explosionSound.play();
   alert("you lost");
-  localStorage.setItem("Highscore", Hscore);
+  localStorage.setItem("H_score", Hscore);
   walls = []; // lsit with all wall objects
   aBullets = []; // list with all bullet objects
   reload = 0; // reload variable, if <= 0 player can fire
