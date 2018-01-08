@@ -24,7 +24,7 @@ header {
 nav {
   float: left;
   clear: left;
-  width: 10%;
+  width: calc(10%);
   margin: 5px;
   margin-left: 0px;
   padding-right: 10px;
@@ -37,7 +37,7 @@ nav {
 }
 .bigSection {
   float: right;
-  width: 85%;
+  width: calc(90% - 10px);
   margin: 5px;
   border-style: solid;
   border-color: grey;
