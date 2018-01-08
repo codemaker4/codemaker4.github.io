@@ -84,11 +84,6 @@ function soundLoud(thisob) {
   return(false);
 }
 
-// if (soundLoud(this)) {
-//   explosionSound.volume = soundLoud();
-//   this.explosionSound.play();
-// }
-
 function create_walls(){
   i = 0;
   while (i < walls.length) {
@@ -102,26 +97,16 @@ function create_walls(){
       randint = Math.floor(random(0,359));
       this.newX = Math.sin(randint) * 1000 + Player.xPos;
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
-      this.newDirection = Math.floor(random(0, 4));
+      this.newDirection = Math.floor(random(0, 2));
       b = 0;
       if (newDirection == 0) {
         while (b < 5) {
           walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20);
           b += 1;
         }
-      } else if (newDirection == 1) {
-        while (b < 5) {
-          walls[walls.length] = new wall(this.newX + (b*-20), this.newY, 20);
-          b += 1;
-        }
-      } else if (newDirection == 2) {
-        while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
-          b += 1;
-        }
       } else {
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*-20), 20);
+          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
           b += 1;
         }
       }
@@ -166,12 +151,6 @@ function particle(xp,yp,xs,ys,col,siz) {
     ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
   }
 }
-
-//var j = 0;
-//while (j < 5) {
-//  particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,0,0],10);
-//  j += 1;
-//}
 
 function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.xPos = X;
@@ -370,23 +349,15 @@ function player() {
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
-//      this.xSpeed -= Math.sin(this.rot + (Math.PI / 2)) / 1.5;
-//      this.ySpeed += Math.cos(this.rot + (Math.PI / 2)) / 1.5;
         this.xSpeed -= 1 / 1.5;
     }
     if (keyIsDown(68)) { //d
-//      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
-//      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
       this.xSpeed += 1 / 1.5
     }
     if (keyIsDown(87)) { //w
-//      this.xSpeed += Math.sin(this.rot) / 1.5;
-//      this.ySpeed -= Math.cos(this.rot) / 1.5;
       this.ySpeed -= 1 / 1.5;
     }
     if (keyIsDown(83)) { //s
-//      this.xSpeed -= Math.sin(this.rot) / 1.5;
-//      this.ySpeed += Math.cos(this.rot) / 1.5;
       this.ySpeed += 1 / 1.5;
     }
     b = 0;
@@ -404,7 +375,6 @@ function player() {
           if (!(isPosit(dx))) { // check side of collision step 2
             this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
             this.xSpeed = 0; // stop xspeed
-//            this.rot += this.ySpeed / 70; // roll against wall
             this.ySpeed = this.ySpeed / 1; // slow down y speed (friction)
           } else { //check side of collision step 2
             this.xPos = walls[b].xPos - (walls[b].size / 2) - (70/2);
@@ -484,6 +454,7 @@ function player() {
     fill(0,255,0,128);
     rect(xScreenSize/-2 + 10,yScreenSize/-2 + 20 + (yScreenSize/75),((xScreenSize-20)/Hscore)*score,yScreenSize/75,20);
     textSize(32);
+    textAlign(LEFT);
     text('Score:' + score.toString() + ' / Highscore:' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
   }
 }
@@ -507,9 +478,21 @@ function playerFire() {
   }
 }
 
+function Pause() {
+  textAlign(CENTER);
+  textSize(32);
+  fill(255,255,255,255)
+  text('PAUSED', xScreenSize/2, yScreenSize/2);
+  textSize(16);
+  text('Press SPACE to continue.', xScreenSize/2, (yScreenSize/2)+100);
+  if (keyIsDown(32)) {
+    stage = 0;
+  }
+}
+
 function draw() {
   create_walls(); // wall algorithim
-  if (stage == 0){ // unused
+  if (stage == 0){ // ingame
     background(0,0,25,255); // darkblue
     fill(0, 255, 0);
     noStroke();
@@ -559,6 +542,12 @@ function draw() {
       particles[a].render();
       a += 1
     }
+    if (keyIsDown(27)) {
+      stage = 1;
+      background(0,0,25,200); // dark blue, slowly fading old ingame frame away.
+    }
+  } else if (stage == 1){ // paused/menu
+    Pause();
   }
   count += 1; // keep count of loop (now unused)
   reload -= 1; // reload cooldown, if < 0, the allow fire
