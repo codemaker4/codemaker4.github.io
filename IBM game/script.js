@@ -37,44 +37,44 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
 
 
-function posit(a) {
+function posit(a) { // returns positive version of a (simply remove the - symbol)
   return(sqrt(a*a));
 }
 
-function isPosit(a) {
+function isPosit(a) { // returns true if a is positive (>=0)
   return(a >= 0);
 }
 
-if (typeof(Storage) !== "undefined") {
-    // Retrieve
-    Hscore = localStorage.getItem("Highscore");
-    // Store
-    //localStorage.setItem("Highscore", Hscore);
-} else {
-    Console.log("Can not store to localStorage");
-}
-
-var eerder = localStorage.getItem("eerder");
+var eerder = localStorage.getItem("eerder"); // checks if game was played earlier
 if (eerder != "ja"){
-  localStorage.setItem("eerder", "ja");
+  localStorage.setItem("eerder", "ja"); // set local storage to default
   localStorage.setItem("H_score", 0);
 }
-Hscore = localStorage.getItem("H_score");
+Hscore = localStorage.getItem("H_score"); // gets highscore from localStorage
 
-function setup() {
+function Onscreen(object, size) {
+  return(object.xPos-cameraX > size*-1 && object.xPos-cameraX < xScreenSize+size && object.yPos-cameraY > size*-1 && object.yPos-cameraY < yScreenSize + size);
+}
+// if (Onscreen(this, 10)) {}
+
+function setup() { // p5 setup
   // create random walls
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
-  barricade_img = loadImage("images/barriecade.png");
+  barricade5 = loadImage("images/barecade/barriecade round.png");
+  barricade4 = loadImage("images/barecade/barriecade round (1).png");
+  barricade3 = loadImage("images/barecade/barriecade round (2).png");
+  barricade2 = loadImage("images/barecade/barriecade round (3).png");
+  barricade1 = loadImage("images/barecade/barriecade round (4).png");
   enemy_img = loadImage("images/enemy.png");
   bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
-function soundLoud(thisob) {
+function soundLoud(thisob) { // returns the loudness of sounds
   this.dx = thisob.xPos - Player.xPos;
   this.dy = thisob.yPos - Player.yPos;
   this.distance = sqrt((dx*dx)+(dy*dy));
@@ -86,27 +86,27 @@ function soundLoud(thisob) {
 
 function create_walls(){
   i = 0;
-  while (i < walls.length) {
+  while (i < walls.length) { // deletes old walls and counts the deleted walss
     if ((walls[i].xPos - cameraX <= -xScreenSize*2) || (walls[i].xPos - cameraX >= xScreenSize + xScreenSize*2) || (walls[i].yPos - cameraY <= -yScreenSize*2) || (walls[i].yPos - cameraY >= yScreenSize + yScreenSize*2)){
       amount_of_walls_deleted += 1;
       walls.splice(i, 1);
       i -= 1;
     }
-    if (amount_of_walls_deleted >= 5) {
+    if (amount_of_walls_deleted >= 5) { // if 5 walls where deleted, make a new wall
 //      console.log(amount_of_walls_deleted);
       randint = Math.floor(random(0,359));
-      this.newX = Math.sin(randint) * 1000 + Player.xPos;
+      this.newX = Math.sin(randint) * 1000 + Player.xPos; // set new x and y
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
       this.newDirection = Math.floor(random(0, 2));
       b = 0;
-      if (newDirection == 0) {
+      if (newDirection == 0) { // chose direction
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20);
+          walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20); // create walls
           b += 1;
         }
       } else {
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
+          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20); // create walls
           b += 1;
         }
       }
@@ -116,17 +116,74 @@ function create_walls(){
   }
 }
 
+function distanceTo(object1, object2) {
+  this.x1 = object1.xPos;
+  this.x2 = object2.xPos;
+  this.y1 = object1.yPos;
+  this.y2 = object2.yPos;
+  this.dx = this.x2-this.x1;
+  this.dy = this.y2-this.y1;
+  return(sqrt((dx*dx)+(dy*dy)));
+}
+
+// distanceTo(this, otherObject)
+
+function wallHitbox(object, size, damage, canBeMoved) {
+  this.loopvar = 0;
+  this.object = object;
+  this.size = size;
+  this.damage = damage;
+  this.hasCollided = false;
+  while (this.loopvar < walls.length) {
+    if (distanceTo(this.object, walls[this.loopvar]) < this.size + walls[this.loopvar].size/2) {
+      if (canBeMoved) {
+        this.direction = Math.atan2(this.object.xPos - walls[this.loopvar].xPos, this.object.yPos - walls[this.loopvar].yPos);
+        this.object.xPos += Math.sin(this.direction) * ((distanceTo(this.object, walls[this.loopvar])-(this.size + walls[this.loopvar].size/2))*-1);
+        this.object.yPos += Math.cos(this.direction) * ((distanceTo(this.object, walls[this.loopvar])-(this.size + walls[this.loopvar].size/2))*-1);
+        this.object.xSpeed = this.object.xSpeed/2;
+        this.object.ySpeed = this.object.ySpeed/2;
+      }
+      this.hasCollided = true;
+      walls[this.loopvar].health -= this.damage;
+      this.b = 0;
+      while (this.b < this.damage) {
+        particles[particles.length] = new particle(walls[this.loopvar].xPos,walls[this.loopvar].yPos,random(-2,2),random(-2,2),[0,255,0],10);
+        this.b += 1;
+      }
+    }
+    this.loopvar += 1;
+  }
+  return(hasCollided);
+}
+
+//wallHitbox(this, 10, 0, true);
+
 function wall(X,Y,size) {
   this.xPos = X;
   this.yPos = Y;
   this.size = size;
-  this.health = 3;
-  // hitbox aBullets
+  this.health = 5;
+  this.tick = function() {
+    if (this.health <= 0) {
+      a -= 1;
+      walls.splice(walls.indexOf(this), 1);
+    }
+  }
   // render
   this.render = function() {
-    rectMode(CENTER);
-    fill(255);
-    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+    if (Onscreen(this, this.size)) {
+      if (Math.ceil(this.health) >= 5) {
+        image(barricade5, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+      } else if (Math.ceil(this.health) >= 4) {
+        image(barricade4, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+      } else if (Math.ceil(this.health) >= 3) {
+        image(barricade3, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+      } else if (Math.ceil(this.health) >= 2) {
+        image(barricade2, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+      } else if (Math.ceil(this.health) >= 1) {
+        image(barricade1, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+      } // if health is 0, wall will not be renderd
+    }
   }
 }
 
@@ -147,8 +204,10 @@ function particle(xp,yp,xs,ys,col,siz) {
     }
   }
   this.render = function() {
-    fill(this.color);
-    ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+    if (Onscreen(this, this.size)) {
+      fill(this.color);
+      ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+    }
   }
 }
 
@@ -163,7 +222,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.explosionSound = new Audio('music/Explosion.mp3');
   this.lazerSound = new Audio('music/LAZER.mp3');
   if (soundLoud(this)) {
-   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the vulume?
+   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the volume?
    this.lazerSound.play();
   }
   this.tick = function() {
@@ -171,40 +230,19 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
     // hitbox walls
-    b = 0;
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos;
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (this.Dam*2.5))) && (posit(dy) < ((walls[b].size / 2) + (this.Dam*2.5)))) {
-        walls[b].size -= 1;
-        if (walls[b].size < 1) {
-          var j = 0;
-          while (j < 10) {
-            particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,255,0],10);
-            j += 1;
-          }
-          walls.splice(b, 1);
-          if (soundLoud(this)) {
-           explosionSound.volume = soundLoud(this);
-           this.explosionSound.play();
-          }
-          b -= 1;
-        }
-        this.Dam -= 3;
-      }
-      b += 1;
+    if (wallHitbox(this, this.Dam*2.5, 1, false)) { // calling wallhitbox also does the nowmal hitbox stuff.
+      this.Dam += -5;
     }
-    //hitbox enemys
-    //hitbox player
     if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize || this.Dam <= 0){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
   }
   //render
   this.render = function() {
-    fill(this.color);
-    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
-    //image(bullet_img, this.xPos - cameraX - this.Dam, this.yPos - cameraY - this.Dam, this.Dam * 2, this.Dam * 2);
+    if (Onscreen(this, this.Dam*2.5)) {
+      fill(this.color);
+      ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
+    }
   }
 }
 
@@ -217,62 +255,33 @@ function enemy(X, Y, HP, REL) {
   this.ySpeed = 0;
   this.size = 60;
   this.ai = function() {
-    dx = Player.xPos - this.xPos;
+    dx = Player.xPos - this.xPos; // check player distance
     dy = Player.yPos - this.yPos;
-    if (sqrt((dx*dx)+(dy*dy)) > 200) {
-      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1;
+    if (sqrt((dx*dx)+(dy*dy)) > 200) { // if far from player:
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1; // go to player
       this.ySpeed += Math.cos(Math.atan2(dx,dy)) * 1;
-    } else {
-      this.xSpeed -= Math.sin(Math.atan2(dx,dy)) * 1;
-      this.ySpeed -= Math.cos(Math.atan2(dx,dy)) * 1;
+    } else {                            // esle:
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // circle around player
+      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
-    this.xSpeed = this.xSpeed / 1.2;
+    this.xSpeed = this.xSpeed / 1.2; // slow down
     this.ySpeed = this.ySpeed / 1.2;
-    b = 0;
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos;
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (this.size/2))) && (posit(dy) < ((walls[b].size / 2) + (this.size/2)))) {
-        if (posit(dx) > posit(dy)) {
-          if (!(isPosit(dx))) {
-            this.xPos = walls[b].xPos + (walls[b].size / 2) + (this.size/2) + 1;
-            this.xSpeed = 0;
-            if (isPosit(Player.yPos - this.yPos)) {
-              this.ySpeed += 1;
-            } else {
-              this.ySpeed -= 1;
-            }
-          } else {
-            this.xPos = walls[b].xPos - (walls[b].size / 2) - (this.size/2) - 1;
-            this.xSpeed = 0;
-            this.ySpeed = this.ySpeed / 5;
-            if (isPosit(Player.yPos - this.yPos)) {
-              this.ySpeed += 1;
-            } else {
-              this.ySpeed -= 1;
-            }
-          }
-        } else {
-          if (!(isPosit(dy))) {
-            this.yPos = walls[b].yPos + (walls[b].size / 2) + (this.size/2) + 1;
-            this.ySpeed = 0;
-            if (isPosit(Player.xPos - this.xPos)) {
-              this.xSpeed += 1;
-            } else {
-              this.xSpeed -= 1;
-            }
-          } else {
-            this.yPos = walls[b].yPos - (walls[b].size / 2) - (this.size/2) - 1;
-            this.ySpeed = 0;
-            if (isPosit(Player.xPos - this.xPos)) {
-              this.xSpeed += 1;
-            } else {
-              this.xSpeed -= 1;
-            }
-          }
-        }
+    wallHitbox(this, this.size/2, 0, true); // wall hitbox
+    this.b = 0; // setup for go away from closest wall
+    this.distanceToWall = 100; //max distance from wall
+    this.closestWall = false;  // true if any wall is the closest
+    while (this.b < walls.length) {
+      if (distanceTo(this, walls[this.b]) < this.distanceToWall) { // check if this wall is closest
+        this.closestWall = this.b; // remember new id
+        this.distanceToWall = distanceTo(this, walls[this.b]); // save distance
       }
-      b += 1;
+      this.b += 1;
+    }
+    if (this.closestWall !== false) { // if any wall found
+      dx = walls[this.closestWall].xPos - this.xPos; // calc distance
+      dy = walls[this.closestWall].yPos - this.yPos;
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // move away from wall
+      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     if (this.reload <= 0) {
       aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
@@ -335,6 +344,7 @@ function restart() {
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
+  stage = 1;
 }
 
 function player() {
@@ -360,44 +370,8 @@ function player() {
     if (keyIsDown(83)) { //s
       this.ySpeed += 1 / 1.5;
     }
-    b = 0;
     //hitboxing walls
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos; // dx = distance X
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (70/2))) && (posit(dy) < ((walls[b].size / 2) + (70/2)))) { // if collision
-        if (sqrt((this.xSpeed*this.xSpeed)+(this.ySpeed*this.ySpeed)) > 7) {
-          this.health -= 3;
-          this.lastHitTime = 500;
-          particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],10);
-        }
-        if (posit(dx) > posit(dy)) { // check side of collision step 1
-          if (!(isPosit(dx))) { // check side of collision step 2
-            this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
-            this.xSpeed = 0; // stop xspeed
-            this.ySpeed = this.ySpeed / 1; // slow down y speed (friction)
-          } else { //check side of collision step 2
-            this.xPos = walls[b].xPos - (walls[b].size / 2) - (70/2);
-            this.xSpeed = 0;
-//            this.rot -= this.ySpeed / 70;
-            this.ySpeed = this.ySpeed / 1;
-          }
-        } else { // check side of collision step 1
-          if (!(isPosit(dy))) { // check side of collision step 2
-            this.yPos = walls[b].yPos + (walls[b].size / 2) + (70/2);
-            this.ySpeed = 0;
-//            this.rot -= this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 1;
-          } else { // check side of collision step 2
-            this.yPos = walls[b].yPos - (walls[b].size / 2) - (70/2);
-            this.ySpeed = 0;
-//            this.rot += this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 1;
-          }
-        }
-      }
-      b += 1;
-    }
+    wallHitbox(this, 35, 0, true);
     b = 0;
     while (b < aBullets.length) {
       dx = aBullets[b].xPos - this.xPos;
@@ -515,6 +489,13 @@ function draw() {
     while (a < particles.length) {
       if (particles[a] !== undefined) {
         particles[a].tick();
+      }
+      a += 1;
+    }
+    a = 0;
+    while (a < walls.length) {
+      if (walls[a] !== undefined) {
+        walls[a].tick();
       }
       a += 1;
     }
