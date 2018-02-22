@@ -36,7 +36,7 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
 var tickRate = 50;
-var itemTypes  = ['Iron','White Enemy Splat','Better Rocket Fuel'];
+var moveSpeed = 1;// *moveSpeed
 var allObjects = [[],[],[],[]]; // [walls,bullets,enemies,particles]
 
 
@@ -60,8 +60,9 @@ function Onscreen(object, mySize) {
 }
 // if (Onscreen(this, 10)) {}
 
-function canUpgrade(upgradeType) {
-
+function setTickRate(newTickRate) {
+  tickRate = newTickRate;
+  moveSpeed = 50/newTickRate;
 }
 
 function setup() { // p5 setup
@@ -221,13 +222,13 @@ function particle(xp,yp,xs,ys,col,siz) {
     }
   }
   this.render = function() {
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.oldGameTime = new Date().getTime();
     if (Onscreen(this, this.mySize)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.mySize,this.mySize);
 // ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.mySize),round(this.mySize)); suddenly stopped working?????
-      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
-      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
-      this.oldGameTime = new Date().getTime();
     }
   }
 }
@@ -254,17 +255,18 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
     }
     if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize || this.Dam <= 0){
       allObjects[1].splice(allObjects[1].indexOf(this), 1);
+      a -= 1;
     }
   }
   //render
   this.render = function() {
+    // move
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.oldGameTime = new Date().getTime();
     if (Onscreen(this, this.Dam*2.5)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
-      // move
-      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
-      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
-      this.oldGameTime = new Date().getTime();
     }
   }
 }
@@ -276,20 +278,22 @@ function enemy(X, Y, HP, REL) {
   this.reload = REL;
   this.xSpeed = 0;
   this.ySpeed = 0;
+  this.goalXSpeed = 0;
+  this.goalYSpeed = 0;
   this.mySize = 60;
   this.oldGameTime = new Date().getTime();
   this.tick = function() {
     dx = Player.xPos - this.xPos; // check player distance
     dy = Player.yPos - this.yPos;
+    this.goalXSpeed = 0;
+    this.goalYSpeed = 0;
     if (sqrt((dx*dx)+(dy*dy)) > 200) { // if far from player:
-      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1; // go to player
-      this.ySpeed += Math.cos(Math.atan2(dx,dy)) * 1;
+      this.goalXSpeed += Math.sin(Math.atan2(dx,dy)) * 1; // go to player
+      this.goalYSpeed += Math.cos(Math.atan2(dx,dy)) * 1;
     } else {                            // esle:
-      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // circle around player
-      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
+      this.goalXSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // circle around player
+      this.goalYSpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
-    this.xSpeed = this.xSpeed / 1.2; // slow down
-    this.ySpeed = this.ySpeed / 1.2;
     wallHitbox(this, this.mySize/2, 0, true); // wall hitbox
     this.b = 0; // setup for go away from closest wall
     this.distanceToWall = 100; //max distance from wall
@@ -304,12 +308,12 @@ function enemy(X, Y, HP, REL) {
     if (this.closestWall !== false) { // if any wall found
       dx = allObjects[0][this.closestWall].xPos - this.xPos; // calc distance
       dy = allObjects[0][this.closestWall].yPos - this.yPos;
-      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // move away from wall
-      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
+      this.goalXSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // move away from wall
+      this.goalXSpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     if (this.reload <= 0) {
       allObjects[1][allObjects[1].length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.mySize/2 + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.mySize/2 + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
-      this.reload = 50;
+      this.reload = 50/moveSpeed;
     }
     b = 0;
     while (b < allObjects[1].length) {
@@ -338,16 +342,21 @@ function enemy(X, Y, HP, REL) {
       }
       b += 1;
     }
+    this.goalDirection = Math.atan2(this.goalXSpeed/1000,this.goalYSpeed/1000);
+    this.xSpeed += Math.sin(this.goalDirection);
+    this.ySpeed += Math.cos(this.goalDirection);
+    this.xSpeed = this.xSpeed / 1.2; // slow down
+    this.ySpeed = this.ySpeed / 1.2;
     this.reload -= 1;
   }
   this.render = function() {
-  //  fill(0,0,255,255);
-  //  ellipse(this.xPos - cameraX,this.yPos - cameraY,this.mySize,this.mySize);
-    image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
     // move
-    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
-    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.oldGameTime = new Date().getTime();
+    if (Onscreen(this, 30)) {
+      image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
+    }
   }
 }
 
@@ -403,10 +412,6 @@ function player() {
     }
     if (keyIsDown(83)) { //s
       this.ySpeed += this.speed;
-    }
-    if (keyIsDown(67)) {
-      stage = 2;
-      background(0,0,25,200);
     }
     if (keyIsDown(27)) {
       stage = 1;
@@ -472,8 +477,8 @@ function player() {
     textAlign(LEFT);
     text('Score:' + score.toString() + ' / Highscore:' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
     // move
-    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime); // update xpos
-    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed; // update xpos
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.oldGameTime = new Date().getTime();
   }
 }
@@ -488,13 +493,13 @@ function playerFire() {
   if (mouseIsPressed) {
     if (Player.reload <= 0) {
       allObjects[1][allObjects[1].length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0],'player');
-      Player.reload = Player.reloadTime;
+      Player.reload = Player.reloadTime/moveSpeed;
     }
   }
   if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
     if (Player.reload <= 0) {
       allObjects[1][allObjects[1].length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 10, [255, 0, 0],'player');
-      Player.reload = 10;
+      Player.reload = 10/moveSpeed;
     }
   }
 }
@@ -577,8 +582,6 @@ function draw() {
     }
   } else if (stage == 1) { // paused/menu
     Pause();
-  }// else if (stage == 2) { // craft menu
-//    CraftMenu();
-//  }
+  }
   count += 1; // keeps count of the amount of ticks that have passed
 }
