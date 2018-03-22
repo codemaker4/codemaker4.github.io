@@ -8,6 +8,11 @@ var zoom = 1;
 var offX = 0;
 var offY = 0;
 var renderStep = 0;
+var listOffsetNum1 = 22;
+var listOffsetNum2 = 80;
+var textSizeA = 40;
+var lastKeyDownTime = 0;
+var leftTextAlignment = false;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
@@ -104,15 +109,26 @@ function reeksRender(size) {
   } else if (keyIsDown(40)) { // down
     listOffset -= size;
   }
+  textAlign(LEFT,BOTTOM);
+  rectMode(CORNERS);
   fill(0);
   textSize(size);
   for (var i = 0; i < reeks.length; i++) {
     var yPos = listOffset+(i*-size);
     if ((yPos > 0) && (yPos < yScreenSize+size)) {
       var textToDisplay = (i+1).toString();
-      textToDisplay += Spaces(((textToDisplay.length-22)*-1));
-      textToDisplay += listToInt(reeks[i]).toString();
-      textToDisplay += Spaces(((textToDisplay.length-50)*-1));
+      textToDisplay += Spaces(((textToDisplay.length-listOffsetNum1)*-1));
+      if (reeks[i].length > listOffsetNum2-listOffsetNum1-5) {
+        textToDisplay += listToInt(reeks[i]).toString();
+        textToDisplay += Spaces(((textToDisplay.length-listOffsetNum2)*-1));
+      } else if (leftTextAlignment) {
+        textToDisplay += Spaces((((textToDisplay.length-listOffsetNum2)+(listToString(reeks[i]).length+5))*-1));
+        textToDisplay += listToString(reeks[i]);
+        textToDisplay += '     '
+      } else {
+        textToDisplay += listToString(reeks[i]);
+        textToDisplay += Spaces(((textToDisplay.length-listOffsetNum2)*-1));
+      }
       if (i != 0) {
         textToDisplay += listToInt(reeks[i]) / listToInt(reeks[i-1]).toString();
       }
@@ -122,22 +138,21 @@ function reeksRender(size) {
       text(textToDisplay, 0, listOffset+(i*-size));
     }
   }
-  fill(255,255,255,200);
+  fill(255,255,255,222);
   stroke(0);
   rect(0,-5,xScreenSize,(size+5)*2)
   fill(0);
-  text('reeks index          | reeks getal               | phi berekend met reeks getallen',0,size);
-  if (reeks.length == 1476) {
-    fill(0,200,0);
-    stroke(0,200,0);
-  } else {
-    fill(0);
-
-  }
+  var textToDisplay = ' reeks index';
+  textToDisplay += Spaces(((textToDisplay.length-listOffsetNum1+1)*-1));
+  textToDisplay += '| reeks getal';
+  textToDisplay += Spaces(((textToDisplay.length-listOffsetNum2+1)*-1));
+  textToDisplay += '| phi berekend met reeks getallen';
+  text(textToDisplay,0,size);
+  fill(0);
   var textToDisplay = 'beste berekend: ' + (reeks.length-1+1).toString();
-  textToDisplay += Spaces(((textToDisplay.length-22)*-1));
+  textToDisplay += Spaces(((textToDisplay.length-listOffsetNum1)*-1));
   textToDisplay += listToInt(reeks[reeks.length-1]).toString();
-  textToDisplay += Spaces(((textToDisplay.length-50)*-1));
+  textToDisplay += Spaces(((textToDisplay.length-listOffsetNum2)*-1));
   textToDisplay += guldenSnede.toString();
   text(textToDisplay,0,size*2);
   stroke(0);
@@ -184,7 +199,7 @@ function rechthoekRender() {
     offX = 0;
     offY = 0;
   }
-  if (keyIsDown(86)) { // v
+  if (keyIsDown(86) || (lastKeyDownTime > 50)) { // v
     offX = smoothChange(offX, 0, 5);
     offY = smoothChange(offY, 0, 5);
   }
@@ -209,16 +224,23 @@ function rechthoekRender() {
     } else {
       nowY += listToInt(reeks[i])*zoom;
     }
+    noFill();
+    rectMode(CORNERS);
+    stroke(0);
     rect(lastX,lastY,nowX,nowY);
     if (i%2 == 0) {
       arc(nowX, lastY, listToInt(reeks[i])*zoom, listToInt(reeks[i])*zoom, (HALF_PI*3) - (HALF_PI*(i % 4)), (HALF_PI*4) - (HALF_PI*(i % 4)));
     } else {
       arc(lastX, nowY, listToInt(reeks[i])*zoom, listToInt(reeks[i])*zoom, (HALF_PI*3) - (HALF_PI*(i % 4)), (HALF_PI*4) - (HALF_PI*(i % 4)));
     }
+    textSize(listToInt(reeks[i])*zoom/3);
+    noStroke();
+    fill(0,0,200,255);
+    rectMode(CENTER);
+    text((listToInt(reeks[i])).toString(), (lastX+nowX)/2, (lastY+nowY)/2);
     lastX = nowX;
     lastY = nowY;
   }
-  stroke(0,0,0,(renderStep%1)*255*2);
   if (iterations % 4 < 2) {
     nowX -= listToInt(reeks[iterations])*zoom;
   } else {
@@ -229,55 +251,79 @@ function rechthoekRender() {
   } else {
     nowY += listToInt(reeks[iterations])*zoom;
   }
+  noFill();
+  stroke(0,0,0,(renderStep%1)*255);
+  rectMode(CORNERS);
   rect(lastX,lastY,nowX,nowY);
-  if (renderStep%1 >= 0.5) {
-    // stroke(0,0,0,((0.5+renderStep)%1)*255*2);
+  if (true) {
     if (iterations%2 == 0) {
-      arc(nowX, lastY, listToInt(reeks[iterations])*zoom, listToInt(reeks[iterations])*zoom, (HALF_PI*4) - (HALF_PI*(i % 4)) - (((0.5+renderStep)%1)*PI), (HALF_PI*0) - (HALF_PI*(i % 4)));
+      arc(nowX, lastY, listToInt(reeks[iterations])*zoom, listToInt(reeks[iterations])*zoom, (HALF_PI*4) - (HALF_PI*(i % 4)) - (((renderStep)%1)*HALF_PI), (HALF_PI*0) - (HALF_PI*(i % 4)));
     } else {
-      arc(lastX, nowY, listToInt(reeks[iterations])*zoom, listToInt(reeks[iterations])*zoom, (HALF_PI*4) - (HALF_PI*(i % 4)) - (((0.5+renderStep)%1)*PI), (HALF_PI*0) - (HALF_PI*(i % 4)));
+      arc(lastX, nowY, listToInt(reeks[iterations])*zoom, listToInt(reeks[iterations])*zoom, (HALF_PI*4) - (HALF_PI*(i % 4)) - (((renderStep)%1)*HALF_PI), (HALF_PI*0) - (HALF_PI*(i % 4)));
     }
   }
+  textSize(listToInt(reeks[iterations])*zoom/3);
+  rectMode(CENTER);
+  noStroke();
+  fill(0,0,200,(renderStep%1)*255);
+  textAlign(CENTER,CENTER);
+  text((listToInt(reeks[iterations])).toString(), (lastX+nowX)/2, (lastY+nowY)/2);
   // console.log((HALF_PI*-1) - (HALF_PI*(i % 4)) + (((0.5+renderStep)%1)*PI));
   // lastX = nowX;
   // lastY = nowY;
-
-  renderStep += 0.01;
+  if (!keyIsDown(88)){ //not x
+    if (state != 3){renderStep += 0.01;}
+    renderStep += 0.01;
+  }
 }
 
 function keyPressed() {
   if (keyIsDown(32)) {// spaceBar
     state = state+1;
-    if (state > 2) {
+    if (state > 3) {
       state = 0;
     }
+  } else if (keyIsDown(76)) { // l
+    leftTextAlignment = !leftTextAlignment;
   }
 }
 
-function animatie() {
-  if (animState == 0) {
-    if (listOffset > yScreenSize*3.5) {
-      animState = 1;
-    }
-  } else if (animState == 1) {
-    if (renderStep > 50) {
-      if (zoom < 0.00000005) {
-        animState = 0;
+function animatie(animType) {
+  if (!keyIsDown(88)) {
+    if (animType == 0) {
+      if (animState == 0) {
+        if (listOffset > yScreenSize*3.5) {
+          animState = 1;
+          renderStep = 1;
+        }
+      } else if (animState == 1) {
+        if (renderStep > 9) {
+          if (zoom < 0.005) {
+            animState = 0;
+          }
+          zoom = zoom * 0.99;
+        } else {
+          zoom = 13;
+        }
       } else {
-        zoom = zoom * 0.98;
+        state = 0;
+      }
+      stateA(animState);
+    } else if (animType == 1) {
+      zoom = 25;
+      stateA(1);
+      if (renderStep > 10) {
+        renderStep = 0;
       }
     }
-  } else {
-    state = 0;
   }
-  stateA(animState);
 }
 
 function stateA(nowState) {
   if (nowState == 0) {
     background(255,255,255,255);
     // verlengReeks();
-    reeksRender(20); // max to fit on screen = 40;
+    reeksRender(textSizeA/2); // max to fit on screen = 40;
     renderStep = 10;
     zoom = 1;
     offX = 0;
@@ -286,7 +332,7 @@ function stateA(nowState) {
     // verlengReeks();
     background(255);
     rechthoekRender();
-    listOffset = 0;
+    listOffset = yScreenSize/2;
   }
 }
 
@@ -298,6 +344,12 @@ function draw() {
   } else if (state == 1) {
     stateA(1);
   } else if (state == 2) {
-    animatie();
+    animatie(0);
+  } else if (state == 3) {
+    animatie(1);
   }
+  if (keyIsPressed === true) {
+    lastKeyDownTime = 0;
+  }
+  lastKeyDownTime += 1;
 }
