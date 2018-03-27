@@ -224,6 +224,12 @@ function drawSpawnObstackles() {
   }
 }
 
+function mouseClicked() {
+  if (stage == 'death') {
+    stage = 'gamestart';
+  }
+}
+
 function setup() { // p5 setup
   createCanvas(xScreenSize, yScreenSize);
   colors.player = color(0);
@@ -268,10 +274,7 @@ function draw() {
     text('You Died!',xScreenSize/2,(yScreenSize/2)-(yScreenSize/10));
     fill(0,0,0,255);
     textSize(yScreenSize/10);
-    text('press C to continue',xScreenSize/2,(yScreenSize/2)+(yScreenSize/10));
-    if (keyIsDown(67)) {
-      stage = 'gamestart';
-    }
+    text('Click to continue',xScreenSize/2,(yScreenSize/2)+(yScreenSize/10));
     speed += 0.05;
     if (speed > 30) {
       speed = 30;
