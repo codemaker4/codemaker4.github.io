@@ -18,12 +18,22 @@ var regenDelay = 500; // time it takes for regen to kick in after last hit by ob
 var regenIterations = 500; // time it takes to regen (if regen is enabled)
 var regenGoalHP = 50; // max HP after regen
 var playerStartHealth = 100; // health of player after init
-var colors = []; // list where colors for objects are stored
+var defColors = []; // list where default Colors for objects are stored
+var images = []; // list where images for onjects are stored.
 var pointsOnObstacleOutOfScreen = false; // if true gives points if a obstackle reaches the end of the schreen without being hit/hiting the player
 var healthBarMargin = 10;
 var distanceRun = 0;
 var healthBarSize = yScreenSize/20;
 var deathScreenTime = 0;
+var Hscore = 0;
+
+var playedEarlier = localStorage.getItem("playedEarlier"); // checks if game was played earlier
+if (playedEarlier != "yes"){
+  localStorage.setItem("playedEarlier", "yes"); // set local storage to default
+  localStorage.setItem("H_score", 0);
+  localStorage.setItem("obstackleImg", '');
+}
+Hscore = localStorage.getItem("H_score"); // gets highscore from localStorage
 
 function isPosit(x) { // returns true if x is 0 or higher
   return (x>=0);
@@ -59,7 +69,7 @@ function obstacle(size, y) { // obstacle object. this is what the player needs t
     this.x -= speed; // move
     if (collides(this, Player)) { // if collision with player
       // stage = 'death';
-      if (Player.ySpeed > 1 && this.y > Player.y-playerSize) { // player going down && lower then player == good
+      if (Player.ySpeed > 1 && this.y > Player.y) { // player going down && lower then player == good
         Player.ySpeed = jumpSpeed/2; // player jumps slightly
         Player.jumpsDone = 0; // player can doublejump again
         obstacklesPassed += 1; // points
@@ -82,8 +92,13 @@ function obstacle(size, y) { // obstacle object. this is what the player needs t
   this.render = function () {
     rectMode(CENTER); // set rect render mode
     noStroke(); // no stroke
-    fill(colors.obstacle); // get correct color
-    rect(this.x,this.y,this.xSize,this.ySize); // draw rect
+    if (images.obstacle !== undefined) {
+      imageMode(CENTER);
+      image(images.obstacle, this.x,this.y,this.xSize,this.ySize);
+    } else {
+      fill(defColors.obstacle); // get correct color
+      rect(this.x,this.y,this.xSize,this.ySize); // draw rect
+    }
   }
 }
 
@@ -173,7 +188,7 @@ function player() {
   this.render = function() {
     noStroke();
     rectMode(CENTER);
-    fill(colors.player);
+    fill(defColors.player);
     rect(this.x, this.y, this.xSize, this.ySize + 1); // player
     // fill(0,0,0,0);
     // stroke(127);
@@ -210,9 +225,9 @@ function drawObstackleRender() {
 }
 
 function drawRenderGround() {
-  // stroke(colors.ground);
+  // stroke(defColors.ground);
   // line(0, groundHight, xScreenSize, groundHight);
-  fill(colors.ground);
+  fill(defColors.ground);
   noStroke();
   rectMode(CORNER);
   rect(0, groundHight, xScreenSize, groundHight);
@@ -230,19 +245,37 @@ function mouseClicked() {
   }
 }
 
+function keyPressed() {
+  if (keyIsDown(79)) {
+    console.log('link vragen');
+    var newImgLink = prompt('Set the image of an enemy by using the link if an image.', 'test');
+    // var newImgLink = 'C:/Users/thijs/school/coderclass/JSrunner/8f2c614788cb9e472680e99e93ae663e--donald-trump-caricature-donald-trunp.jpg';
+    console.log('link ontvangen');
+    loadImage(newImgLink, function(img) {
+      images.obstacle = img;
+      localStorage.setItem("obstackleImg", newImgLink);
+      console.log('correct geladen en opgeslagen');
+    }, function(img) {console.log('niet geladen');});
+  }
+}
+
 function setup() { // p5 setup
   createCanvas(xScreenSize, yScreenSize);
-  colors.player = color(0);
-  colors.obstacle = color(100);
-  colors.ground = color(50);
-  colors.sky = color(255);
+  defColors.player = color(0);
+  defColors.obstacle = color(100);
+  defColors.ground = color(50);
+  defColors.sky = color(255);
+  images.obstacle = undefined;
+  loadImage(localStorage.getItem("obstackleImg"), function(img) {
+    images.obstacle = img;
+  });
   Player = new player();
 }
 
 function draw() {
   if (stage == 'ingame') {
     translate(0,0);
-    background(colors.sky);
+    background(defColors.sky);
     drawSetSpeed();
     Player.tick();
     drawObstackleTick();
@@ -261,25 +294,24 @@ function draw() {
   } else if (stage == 'death') {
     // console.log('death');
     // alert('you died');
+    if (obstacklesPassed > Hscore) {
+      Hscore = obstacklesPassed;
+      localStorage.setItem("H_score", Hscore);
+    }
     Player.x = -playerSize*2;
-    background(colors.sky);
-    drawObstackleTick();
-    drawObstackleRender();
-    drawRenderGround();
-    drawSpawnObstackles();
-    background(127,127,127,deathScreenTime);
-    fill(255,0,0,200);
+    background(127,127,127,deathScreenTime/10);
+    fill(255,0,0,255);
     textSize(yScreenSize/5);
     textAlign(CENTER, CENTER);
     text('You Died!',xScreenSize/2,(yScreenSize/2)-(yScreenSize/10));
     fill(0,0,0,255);
     textSize(yScreenSize/10);
-    text('Click to continue',xScreenSize/2,(yScreenSize/2)+(yScreenSize/10));
+    text('Score: ' + obstacklesPassed.toString() + ', High score: ' + Hscore.toString(),xScreenSize/2,(yScreenSize/2)+(yScreenSize/10))
+    text('Click to continue.',xScreenSize/2,(yScreenSize/2)+(yScreenSize/4));
     speed += 0.05;
     if (speed > 30) {
       speed = 30;
     }
-    obstacklesPassed = 50 * speed;
     deathScreenTime += 1;
   }
   clock += 1;
