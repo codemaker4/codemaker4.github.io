@@ -1,4 +1,4 @@
-var xScreenSize = innerWidth - 4; // canvas size
+var xScreenSize = innerWidth - 5; // canvas size
 var yScreenSize = innerHeight - 5;
 var stage = 0; // 0 = ingame
 var walls = []; // lsit with all wall objects
@@ -48,12 +48,12 @@ function isPosit(a) { // returns true if a is positive (>=0)
   return(a >= 0);
 }
 
-var eerder = localStorage.getItem("eerder"); // checks if game was played earlier
-if (eerder != "ja"){
-  localStorage.setItem("eerder", "ja"); // set local storage to default
-  localStorage.setItem("H_score", 0);
+var SGeerder = localStorage.getItem("SGeerder"); // checks if game was played earlier
+if (SGeerder != "ja"){
+  localStorage.setItem("SGeerder", "ja"); // set local storage to default
+  localStorage.setItem("SGH_score", 0);
 }
-Hscore = localStorage.getItem("H_score"); // gets highscore from localStorage
+Hscore = localStorage.getItem("SGH_score"); // gets highscore from localStorage
 
 function Onscreen(object, mySize) {
   return(object.xPos-cameraX > mySize*-1 && object.xPos-cameraX < xScreenSize+mySize && object.yPos-cameraY > mySize*-1 && object.yPos-cameraY < yScreenSize + mySize);
@@ -78,7 +78,6 @@ function setup() { // p5 setup
   barricade2 = loadImage("images/barecade/barriecade round (3).png");
   barricade1 = loadImage("images/barecade/barriecade round (4).png");
   enemy_img = loadImage("images/enemy.png");
-  bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
@@ -283,11 +282,9 @@ function enemy(X, Y, HP, REL) {
   this.mySize = 60;
   this.oldGameTime = new Date().getTime();
   this.tick = function() {
-    dx = Player.xPos - this.xPos; // check player distance
-    dy = Player.yPos - this.yPos;
     this.goalXSpeed = 0;
     this.goalYSpeed = 0;
-    if (sqrt((dx*dx)+(dy*dy)) > 200) { // if far from player:
+    if (distanceTo(this, Player) > 200) { // if far from player:
       this.goalXSpeed += Math.sin(Math.atan2(dx,dy)) * 1; // go to player
       this.goalYSpeed += Math.cos(Math.atan2(dx,dy)) * 1;
     } else {                            // esle:
@@ -295,6 +292,16 @@ function enemy(X, Y, HP, REL) {
       this.goalYSpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     wallHitbox(this, this.mySize/2, 0, true); // wall hitbox
+    this.b = 0;
+    while (this.b < allObjects[2].length) {
+      if (allObjects[2] != this) {
+        this.direction = Math.atan2(this.xPos - allObjects[0][this.loopvar].xPos, this.yPos - allObjects[0][this.loopvar].yPos);
+        this.object.xPos += Math.sin(this.direction) * ((distanceTo(this.object, allObjects[0][this.loopvar])-(this.mySize + allObjects[0][this.loopvar].mySize/2))*-1);
+        this.object.yPos += Math.cos(this.direction) * ((distanceTo(this.object, allObjects[0][this.loopvar])-(this.mySize + allObjects[0][this.loopvar].mySize/2))*-1);
+        this.object.xSpeed = this.object.xSpeed/2;
+        this.object.ySpeed = this.object.ySpeed/2;
+      }
+    }
     this.b = 0; // setup for go away from closest wall
     this.distanceToWall = 100; //max distance from wall
     this.closestWall = false;  // true if any wall is the closest
@@ -332,11 +339,6 @@ function enemy(X, Y, HP, REL) {
           score += 50;
           difficulty += 0.1;
           allObjects[2].splice(allObjects[2].indexOf(this), 1);
-          while (Math.floor(difficulty) > allObjects[2].length) {
-            randint = Math.floor(random(0,359));
-            allObjects[2][allObjects[2].length] = new enemy(Math.sin(randint) * 1000 + Player.xPos,Math.cos(randint) * 2000 + Player.yPos,enemyHP,50);
-            c -= 1;
-          }
           a -= 1;
         }
       }
@@ -362,12 +364,20 @@ function enemy(X, Y, HP, REL) {
 
 allObjects[2] = [new enemy(0,0,enemyHP,50)];
 
+function summonEnemies() {
+  while (Math.floor(difficulty) > allObjects[2].length) {
+    randint = Math.floor(random(0,359));
+    allObjects[2][allObjects[2].length] = new enemy(Math.sin(randint) * 1000 + Player.xPos,Math.cos(randint) * 2000 + Player.yPos,enemyHP,50);
+    c -= 1;
+  }
+}
+
 function restart() {
   gameTickCount = 0;
   explosionSound.volume = 1;
   explosionSound.play();
   alert("you lost");
-  localStorage.setItem("H_score", Hscore);
+  localStorage.setItem("SGH_score", Hscore);
   allObjects[0] = []; // lsit with all wall objects
   allObjects[1] = []; // list with all bullet objects
   reload = 0; // reload variable, if <= 0 player can fire

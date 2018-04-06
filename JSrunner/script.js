@@ -27,13 +27,13 @@ var healthBarSize = yScreenSize/20;
 var deathScreenTime = 0;
 var Hscore = 0;
 
-var playedEarlier = localStorage.getItem("playedEarlier"); // checks if game was played earlier
-if (playedEarlier != "yes"){
-  localStorage.setItem("playedEarlier", "yes"); // set local storage to default
-  localStorage.setItem("H_score", 0);
+var JSRplayedEarlier = localStorage.getItem("JSRplayedEarlier"); // checks if game was played earlier
+if (JSRplayedEarlier != "yes"){
+  localStorage.setItem("JSRplayedEarlier", "yes"); // set local storage to default
+  localStorage.setItem("JSRH_score", 0);
   localStorage.setItem("obstackleImg", '');
 }
-Hscore = localStorage.getItem("H_score"); // gets highscore from localStorage
+Hscore = localStorage.getItem("JSRH_score"); // gets highscore from localStorage
 
 function isPosit(x) { // returns true if x is 0 or higher
   return (x>=0);
@@ -296,7 +296,7 @@ function draw() {
     // alert('you died');
     if (obstacklesPassed > Hscore) {
       Hscore = obstacklesPassed;
-      localStorage.setItem("H_score", Hscore);
+      localStorage.setItem("JSRH_score", Hscore);
     }
     Player.x = -playerSize*2;
     background(127,127,127,deathScreenTime/10);
