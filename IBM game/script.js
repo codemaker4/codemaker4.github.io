@@ -292,7 +292,7 @@ function enemy(X, Y, HP, REL) {
       this.goalYSpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     wallHitbox(this, this.mySize/2, 0, true); // wall hitbox
-    this.b = 0;
+    this.loopvar = 0;
     while (this.b < allObjects[2].length) {
       if (allObjects[2] != this) {
         this.direction = Math.atan2(this.xPos - allObjects[0][this.loopvar].xPos, this.yPos - allObjects[0][this.loopvar].yPos);
@@ -301,6 +301,7 @@ function enemy(X, Y, HP, REL) {
         this.object.xSpeed = this.object.xSpeed/2;
         this.object.ySpeed = this.object.ySpeed/2;
       }
+      this.loopvar += 1;
     }
     this.b = 0; // setup for go away from closest wall
     this.distanceToWall = 100; //max distance from wall
