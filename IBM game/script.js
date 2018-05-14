@@ -10,7 +10,6 @@ var bullet_img;
 var aantal_muren = 30; // aantal muren in het begin
 var a = 0; // loop counter
 var b = 0;
-var c = 0;
 var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
 var reload = 0; // reload variable, if <= 0 player can fire
@@ -292,16 +291,16 @@ function enemy(X, Y, HP, REL) {
       this.goalYSpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     wallHitbox(this, this.mySize/2, 0, true); // wall hitbox
-    this.loopvar = 0;
+    this.b = 0;
     while (this.b < allObjects[2].length) {
-      if (allObjects[2] != this) {
+      if (allObjects[2][this.loopvar] != this && allObjects[2][this.loopvar] !== undefined) {
         this.direction = Math.atan2(this.xPos - allObjects[0][this.loopvar].xPos, this.yPos - allObjects[0][this.loopvar].yPos);
         this.object.xPos += Math.sin(this.direction) * ((distanceTo(this.object, allObjects[0][this.loopvar])-(this.mySize + allObjects[0][this.loopvar].mySize/2))*-1);
         this.object.yPos += Math.cos(this.direction) * ((distanceTo(this.object, allObjects[0][this.loopvar])-(this.mySize + allObjects[0][this.loopvar].mySize/2))*-1);
         this.object.xSpeed = this.object.xSpeed/2;
         this.object.ySpeed = this.object.ySpeed/2;
       }
-      this.loopvar += 1;
+      this.b += 1;
     }
     this.b = 0; // setup for go away from closest wall
     this.distanceToWall = 100; //max distance from wall
@@ -369,7 +368,6 @@ function summonEnemies() {
   while (Math.floor(difficulty) > allObjects[2].length) {
     randint = Math.floor(random(0,359));
     allObjects[2][allObjects[2].length] = new enemy(Math.sin(randint) * 1000 + Player.xPos,Math.cos(randint) * 2000 + Player.yPos,enemyHP,50);
-    c -= 1;
   }
 }
 
@@ -377,7 +375,7 @@ function restart() {
   gameTickCount = 0;
   explosionSound.volume = 1;
   explosionSound.play();
-  alert("you lost");
+  // alert("you lost");
   localStorage.setItem("SGH_score", Hscore);
   allObjects[0] = []; // lsit with all wall objects
   allObjects[1] = []; // list with all bullet objects
@@ -391,7 +389,7 @@ function restart() {
   for (j = 0; j < aantal_muren; j++){
     allObjects[0][allObjects[0].length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
-  stage = 1;
+  stage = 0;
 }
 
 function player() {
@@ -443,7 +441,7 @@ function player() {
       b += 1;
     }
     if (this.health <= 0) {
-      restart();
+      stage = 2; // death
       var j = 0;
       while (j < 10) {
         allObjects[3][allObjects[3].length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],15);
@@ -577,12 +575,25 @@ function gameRender() {
   Player.render(); // player renders on top
 }
 
+function deathAnim() {
+  background(0,0,25,10);
+  fill(255,0,0,255);
+  textSize(yScreenSize/5);
+  textAlign(CENTER, CENTER);
+  text('You Died!',xScreenSize/2,(yScreenSize/2)-(yScreenSize/10));
+  fill(0,0,0,255);
+  textSize(yScreenSize/10);
+  text('Score: ' + score.toString() + ', High score: ' + Hscore.toString(),xScreenSize/2,(yScreenSize/2)+(yScreenSize/10))
+  text('press C to continue',xScreenSize/2,(yScreenSize/2)+(yScreenSize/4));
+}
+
 // this.oldGameTime = new Date().getTime();
 // *ticksPassed(this.oldGameTime)
 
 function draw() {
   create_walls(); // wall algorithim
   if (stage == 0){ // ingame
+    summonEnemies();
     if (ticksPassed(oldGameTime) >= 1) {
       gameTick();
       gameTickCount += 1;
@@ -593,6 +604,8 @@ function draw() {
     }
   } else if (stage == 1) { // paused/menu
     Pause();
+  } else if (stage == 2) { // death
+    deathAnim();
   }
   count += 1; // keeps count of the amount of ticks that have passed
 }
