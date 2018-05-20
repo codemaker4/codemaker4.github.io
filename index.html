@@ -19,12 +19,18 @@
       <a href="IBM game/game.html" target="_blank" class="navlink">Space Game</a><br>
       <a href="JSrunner/JSrunner.html" target="_blank" class="navlink">JSrunner</a><br>
       <a href="jsWorldGen/JSworldGen.html" target="_blank" class="navlink">JS world gen</a><br>
+      <a href="JSmath/math.html" target="_blank" class="navlink">math plotter</a><br>
       <a href="fibonacci/gulden.html" target="_blank" class="navlink">fibonacci program</a><br>
       <br>
       <img src="images/CM4 animation.gif" alt="This does not work..." class="sideAnimation">
     </nav>
     <section class='bigSection'>
       <div class="sectionItem"><h1>My blog</h1></div>
+      <div class="sectionItem">
+        <p><b>releasing math plotter</b></p>
+        <p>I modified JSWorldGen to now plot any mathematical equation. You can move around by swiping/dragging or using WASD. To set the shown formula, press the + icon on the top left and enter a javascript function in the popup. For example "return x+y" or "return y/(x%255)". The <a href="https://p5js.org/reference/#group-Math">p5.js</a> library is also available in these functions, for example "return dist(0,0,x,y)" or "return noise(x/100, y/100)". NOTE: if your function returns a integer, it must be between 0 and 255. if not, the value will be lowerd/higherd to be inside this range. TIP: at the end of your function add "%255". this makes sure that the returned value is in between 0 and 255. Try "return dist(0,0,x,y)%255" to understand it's effect better.<br>
+           You can also let your function return booleans, for example "return x == y" or "return round(dist(0,0,x,y)) == 100" </p>
+      </div>
       <div class="sectionItem">
         <p><b>JS WorldGen update</b></p>
         <p>I updated JSWorldGen to now calculate the terrain in chunks. You can now move around in the world using WASD controls or by swiping/dragging. In the coming updates a zoom function and maybe also 3d rendering.<br>
