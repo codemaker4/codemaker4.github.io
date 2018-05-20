@@ -256,6 +256,18 @@ function move() {
   }
 }
 
+function mousePressed() {
+  mouseDownX = mouseX;
+  mouseDownY = mouseY;
+  mouseDownViewX = viewX;
+  mouseDownViewY = viewY;
+}
+
+function mouseDragged() {
+  viewX = mouseDownViewX + (mouseDownX-mouseX)*-1;
+  viewY = mouseDownViewY + (mouseDownY-mouseY)*-1;
+}
+
 function draw(){ // p5 loop
   move();
   prepChunkArea(-viewX, -viewY, -viewX+xScreenSize, -viewY+yScreenSize);
