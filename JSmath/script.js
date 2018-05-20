@@ -16,7 +16,8 @@ var mouseDownX = 0;
 var mouseDownY = 0;
 var mouseDownViewX = 0;
 var mouseDownViewY = 0;
-var calculation = new Function("x", "y", "return x+y");
+var calculationString = "return x+y"
+var calculation = new Function("x", "y", calculationString);
 
 document.addEventListener('contextmenu', event => event.preventDefault()); // prevent rightclick menu to make rihtclick control less annoying to use.
 
@@ -40,11 +41,14 @@ function calcPixel(x,y) {
 }
 
 function setCalculation() {
-  calculation = new Function("x", "y", prompt('enter JavaScript calculation here, using variables "x" and "y":', 'return x+y'));
+  calculationString = prompt('enter JavaScript calculation here, using variables "x" and "y":', calculationString)
+  calculation = new Function("x", "y", calculationString);
   chunks = [];
   chunksDone = [];
   pixelWorld = [];
   renderUpdateToDo = true;
+  viewX = 0;
+  viewY = 0;
 }
 
 function mouseInArea(x,y,x2,y2) {
