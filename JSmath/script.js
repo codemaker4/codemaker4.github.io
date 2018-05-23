@@ -32,13 +32,15 @@ function calcPixel(x,y) {
   var doneCalc = calculation(x, -y); // vertical flip, if not flipped graphs will be upsideDown.
   if (typeof doneCalc === 'boolean') {
     if (doneCalc) {
-      return(255);
+      return([255,255,255]);
     }
-    return(0);
+    return([0,0,0]);
   } if (!isNaN(doneCalc)) { // 'if notnot a number' is the same as 'if a number' ;)
-    return(calculation(x, y));
+    return([doneCalc,doneCalc,doneCalc]);
+  } if (typeof doneCalc === 'object') {// array
+    return(doneCalc)
   }
-  return(NaN);
+  return([NaN,NaN,NaN]);
 }
 
 function setCalculation() {
@@ -166,9 +168,9 @@ function chunk(initX, initY, xSize, ySize) {
       }
       var currentPos = getXY(i/4, Math.ceil(this.xSize/this.nextChunkImgPixSize));
       var data = getWorldHeight(currentPos[0]*this.nextChunkImgPixSize+this.xPos,currentPos[1]*this.nextChunkImgPixSize+this.yPos);
-      this.nextChunkImg.pixels[i] = data;
-      this.nextChunkImg.pixels[i+1] = data;
-      this.nextChunkImg.pixels[i+2] = data
+      this.nextChunkImg.pixels[i] = data[0];
+      this.nextChunkImg.pixels[i+1] = data[1];
+      this.nextChunkImg.pixels[i+2] = data[2];
       this.nextChunkImg.pixels[i+3] = 255;
       i+=4;
     }
