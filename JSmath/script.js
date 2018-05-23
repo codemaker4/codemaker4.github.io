@@ -7,7 +7,6 @@ var resToCalc = 5;
 var chunkSize = 100;
 var viewX = 0;
 var viewY = 0;
-var renderUpdateToDo = false;
 var lowresChunksExist = true;
 var pixSizeSteps = [20,10,5,1,0.5,0.1,0.05];
 var beginTickTime = new Date().getTime();
@@ -18,17 +17,19 @@ var mouseDownViewX = 0;
 var mouseDownViewY = 0;
 var calculationString = "return x+y"
 var calculation = new Function("x", "y", calculationString);
+var notAllowedInCalculationString = ['creen','inner','pix','Pix','world','hunk','view','ick','ouse','calc','Calc','setup','anvas','Date','ge','Index','getXY','isDone','background','mage','move','buttonWasPressed','key','draw','text','stroke','fill','clear','color','arc','ellipse','line','point','quad','rect','triabgle','mooth','bezier','curve','begin','end','ertex','plane','box','sphere','cylinder','cone','ellipsoid','torus','loop','load','pop','push','redraw','ursor','display','window','width','height','Density','URL','Element','raphics','atrix','rotate','scale','shear','translate','tint','Tint','blend','copy','filter','get','set','http','save','day','hour','minute','millis','month','second','year','ector'];
+
+var neededInCalculationString = ['return'];
 
 document.addEventListener('contextmenu', event => event.preventDefault()); // prevent rightclick menu to make rihtclick control less annoying to use.
 
 function setup() { // p5 setup
   createCanvas(xScreenSize, yScreenSize);
-  noiseDetail();
   noSmooth();
 }
 
 function calcPixel(x,y) {
-  var doneCalc = calculation(x, y);
+  var doneCalc = calculation(x, -y); // vertical flip, if not flipped graphs will be upsideDown.
   if (typeof doneCalc === 'boolean') {
     if (doneCalc) {
       return(255);
@@ -37,18 +38,40 @@ function calcPixel(x,y) {
   } if (!isNaN(doneCalc)) { // 'if notnot a number' is the same as 'if a number' ;)
     return(calculation(x, y));
   }
-  return(0);
+  return(NaN);
 }
 
 function setCalculation() {
   calculationString = prompt('enter JavaScript calculation here, using variables "x" and "y":', calculationString)
+  var evaluatedCalculation = evaluateCalculation();
+  while (evaluatedCalculation !== true) {
+    calculationString = prompt(evaluatedCalculation, calculationString)
+    evaluatedCalculation = evaluateCalculation();
+  }
   calculation = new Function("x", "y", calculationString);
   chunks = [];
   chunksDone = [];
   pixelWorld = [];
-  renderUpdateToDo = true;
   viewX = 0;
   viewY = 0;
+}
+
+function evaluateCalculation() {
+  if (calculationString.indexOf('//F') !== -1) {
+    return(true);
+  }
+  for (var i = 0; i < neededInCalculationString.length; i++) {
+    if (calculationString.indexOf(neededInCalculationString[i]) === -1) {
+      return('Your formula returns nothing. To return the awnser of your formula, use "return [formulaAwnser]". If you want to view the formula anyway, add "//F" to the end of the formula.');
+    }
+  }
+  for (var i = 0; i < notAllowedInCalculationString.length; i++) {
+    if (calculationString.indexOf(notAllowedInCalculationString[i]) !== -1) {
+      console.log('"' + notAllowedInCalculationString[i] + '" is not allowed.');
+      return('There is a chance that you are using a variable/function that, when changed/called, can crash the program. make sure all your own variables begin with "my" or rename them completely. If you want to view the formula anyway, add "//F" to the end of the formula.');
+    }
+  }
+  return(true);
 }
 
 function mouseInArea(x,y,x2,y2) {
@@ -199,9 +222,7 @@ function newChunk(x,y) {
 function prepChunkArea(x,y,x2,y2) {
   for (var i = x; i < x2; i+= chunkSize) {
     for (var j = y; j < y2; j+= chunkSize) {
-      if (prepChunk(i,j)) {
-        renderUpdateToDo = true;
-      }
+      prepChunk(i,j);
     }
   }
 }
@@ -224,9 +245,6 @@ function genChunks() {
           var generated = chunks[i].genPartChunk(chunks[i].nextChunkImgGenIteration, 1000);
           if (generated[0]) {
             chunksUpdated += 1;
-            if (generated[1]) {
-              renderUpdateToDo = true;
-            }
           }
         }
       }
@@ -252,16 +270,12 @@ function setCalculationButton() {
 function move() {
   if (keyIsDown(87)) { // w
     viewY += 5;
-    renderUpdateToDo = true;
   } else if (keyIsDown(83)) { // s
     viewY -= 5;
-    renderUpdateToDo = true;
   } if (keyIsDown(65)) { // a
     viewX += 5;
-    renderUpdateToDo = true;
   } else if (keyIsDown(68)) { // d
     viewX -= 5;
-    renderUpdateToDo = true;
   }
 }
 
@@ -296,9 +310,14 @@ function draw(){ // p5 loop
   move();
   prepChunkArea(-viewX, -viewY, -viewX+xScreenSize, -viewY+yScreenSize);
   genChunks();
-  if (renderUpdateToDo) {
-    renderChunks();
-    renderUpdateToDo = false;
-  }
+  renderChunks();
   setCalculationButton();
+  textAlign(LEFT);
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  textSize(50);
+  text('x:' + (mouseX-viewX).toString(),0,100);
+  text('y:' + -(mouseY-viewY).toString(),0,150);
+  text('val:' + calcPixel(mouseX-viewX, mouseY-viewY).toString(),0,200);
 }
