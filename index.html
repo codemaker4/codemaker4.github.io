@@ -11,7 +11,7 @@
       <p class="headerP">Welcome to CodeMaker4's page.</p>
     </header>
     <nav class='nav home'>
-      <a href="index.html" class="navlink">Home</a><br>
+      <a href="https://codemaker4.github.io" class="navlink">Home</a><br>
       <a href="allHTML/badges.html" class="navlink">badges</a><br>
       <a href="allHTML/projects.html" class="navlink">projects</a><br>
       <a href="allHTML/contact.html" class="navlink">contact</a><br>
@@ -25,7 +25,11 @@
       <img src="images/CM4 animation.gif" alt="This does not work..." class="sideAnimation">
     </nav>
     <section class='bigSection'>
-      <div class="sectionItem"><h1>My blog</h1></div>
+      <div class="sectionItem"><h1>Updates</h1></div>
+      <div class="sectionItem">
+        <p><b>New domain name!</b></p>
+        <p>You can now also go to this page by visiting <a href="http://codem4.tk/">codem4.tk</a>! When you visit that page, it will automaticly go to <a href="https://codemaker4.github.io">codemaker4.github.io</a> instead. If you want to set a bookmark for my page, I suggest to make sure you use <a href="https://codemaker4.github.io">codemaker4.github.io</a> instead of <a href="http://codem4.tk/">codem4.tk</a>, because this may change and <a href="https://codemaker4.github.io">codemaker4.github.io</a> is faster. </p>
+      </div>
       <div class="sectionItem">
         <p><b>Update: JSowlrdGen should now work faster</b></p>
         <p>The terrain generation of JSworldgen used square roots to calculate the distance between each pixel an each heightpoint. Square roots need much time to be calculated, and because it needs to calculate +- 3000 distances per pixel, it slows down the algorithim quite a bit. You can also calculate the distance by simply not putting the sqrt() around the scuared distances along the 2 axises. This does result in the new function not returning the actual distance, but a much heigher value that is still usable. Also the max amount of calculations per frame is now not limited by a fixed value, but instead the algorithim keeps on calculating new pixels untill 25ms since the last frame have passed. This results in a max framerate of 40FPS, wich is enough to my opinion.</p>
