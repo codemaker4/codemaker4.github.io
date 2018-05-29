@@ -27,6 +27,10 @@
     <section class='bigSection'>
       <div class="sectionItem"><h1>My blog</h1></div>
       <div class="sectionItem">
+        <p><b>Update: JSowlrdGen should now work faster</b></p>
+        <p>The terrain generation of JSworldgen used square roots to calculate the distance between each pixel an each heightpoint. Square roots need much time to be calculated, and because it needs to calculate +- 3000 distances per pixel, it slows down the algorithim quite a bit. You can also calculate the distance by simply not putting the sqrt() around the scuared distances along the 2 axises. This does result in the new function not returning the actual distance, but a much heigher value that is still usable. Also the max amount of calculations per frame is now not limited by a fixed value, but instead the algorithim keeps on calculating new pixels untill 25ms since the last frame have passed. This results in a max framerate of 40FPS, wich is enough to my opinion.</p>
+      </div>
+      <div class="sectionItem">
         <p><b>Update: Math plotter can now show RGB colors</b></p>
         <p>I updated MathPoltter to now accept arrays of 3 items and show the values of the items in different colors. This only applies when using something like "return [Redval, Blueval, Greenval]". You can now only give integers, but in the future you can also return booleans in the array. When returning only a integer or a boolean, the old behavior applies. All old functions should still work.<br>
         You can with some smart JS still use booleans with the new color channels. This can be done by first calculation the boolean and next use an if-statement to turn it into an integer. This function plots a red and a green line, with a blue circle at (0,0). "var myBlue = (dist(0,0,x,y) < 100); if (myBlue) {myBlue = 255;} else {myBlue = 0;} return [abs(y-(x*2+5))*-1+255, abs(y-(x*-2-5))*-1+255, myBlue]"<br>

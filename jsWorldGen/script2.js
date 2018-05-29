@@ -13,6 +13,8 @@ var viewY = 0;
 var renderUpdateToDo = false;
 var lowresChunksExist = true;
 var pixSizeSteps = [20,10,5,1];
+var millisAtStart = 0;
+var maxCalcTime = 25;
 
 document.addEventListener('contextmenu', event => event.preventDefault()); // prevent rightclick menu to make rihtclick control less annoying to use.
 
@@ -24,15 +26,17 @@ function setup() { // p5 setup
   }
   diagSize = dist(0,0,xScreenSize,yScreenSize);
   noSmooth();
+  millisAtStart = millis();
 }
 
 function calcPixel(x,y) {
   var total = 0; // begin average calculation.
   var totWeight = 0;
   for (var i = 0; i < points.length; i++) {
-    var distance = dist(x,y,points[i][0],points[i][1])
+    // var distance = dist(x,y,points[i][0],points[i][1]);
+    var distance = FastDist(x,y,points[i][0],points[i][1]);
     if (distance < 1000) {
-      var weight = Math.pow(1.5,((distance*-1)+diagSize)/10);
+      var weight = Math.pow(1.2,((distance*-1)+diagSize)/10);
       total += points[i][2]*weight;
       totWeight += weight;
     }
@@ -52,6 +56,16 @@ function calcPixel(x,y) {
 //   }
 //   return(points[closestID][2]);
 // }
+
+function FastDist(x1,y1,x2,y2) {
+  var xD = x2-x1;
+  var yD = y2-y1;
+  return((xD*xD+yD*yD)/100);
+}
+
+function calcTimeLeft() {
+  return(millisAtStart+maxCalcTime > millis());
+}
 
 function prepWorldPixel(x,y) { // prepares worldPixel at spicific location to stop undefined errors. returns true if new pixels where prepared, else returns false.
   if (pixelWorld[x] === undefined) {
@@ -219,7 +233,7 @@ function genChunks() {
   for (var r = 0; r < pixSizeSteps.length; r++) {
     // pixSizeSteps[i]
     var i = 0;
-    while (chunksUpdated < 2) {
+    while (calcTimeLeft()) { // (chunksUpdated < 2
       if (onScreen(chunks[i].xPos+viewX, chunks[i].yPos+viewY) || onScreen(chunks[i].xPos+viewX+chunkSize, chunks[i].yPos+viewY+chunkSize)) {
         if (chunks[i].nextChunkImgPixSize >= pixSizeSteps[r]) { // proirity
           var generated = chunks[i].genPartChunk(chunks[i].nextChunkImgGenIteration, 30);
@@ -269,6 +283,7 @@ function mouseDragged() {
 }
 
 function draw(){ // p5 loop
+  millisAtStart = millis();
   move();
   prepChunkArea(-viewX, -viewY, -viewX+xScreenSize, -viewY+yScreenSize);
   genChunks();
