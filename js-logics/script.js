@@ -1,5 +1,10 @@
 var xScreenSize = innerWidth - 5; // canvas size
 var yScreenSize = innerHeight - 5;
+var version = 'Beta 1.3'
+var gateSize = 100;
+var connectionsVisible = true;
+var connectionOpacity = 127;
+var arrowOpacity = 255;
 var viewX = 0;
 var viewY = 0;
 var viewZoom = 1.0;
@@ -39,6 +44,7 @@ function gate(initX, initY, type) {
     if (this.selected === true) {
       stroke(0,0,255);
       strokeWeight(10);
+      tint(127,127,255,255);
     } else {
       stroke(0,0,50);
       strokeWeight(2);
@@ -49,9 +55,10 @@ function gate(initX, initY, type) {
       fill(0,100,0);
     }
     rectMode(CENTER);
-    rect(this.xPos, this.yPos, 100, 100);
+    rect(this.xPos, this.yPos, gateSize, gateSize);
     imageMode(CENTER)
-    image(typesI[this.gateType], this.xPos, this.yPos, 100, 100);
+    image(typesI[this.gateType], this.xPos, this.yPos, gateSize, gateSize);
+    tint(255,255,255,255);
     textAlign(CENTER, CENTER);
     fill(0)
     textSize(size/2);
@@ -81,7 +88,7 @@ function popUp(x,y,xSize,ySize,popupText) {
 function connection(comesFrom, goesTo) {
   this.connectionStart = comesFrom;
   this.connectionEnd = goesTo;
-  this.color = color(random(50,200), random(50,200), random(50,200),150);
+  this.color = color(random(50,200), random(50,200), random(50,200),connectionOpacity);
   this.render = function() {
     stroke(this.color);
     strokeWeight(5);
@@ -92,9 +99,9 @@ function connection(comesFrom, goesTo) {
     var averageY = (gate1.yPos + gate2.yPos) / 2;
     push();
       if (gates[this.connectionStart].value === true) {
-        fill(255);
+        fill(255, 255, 255, arrowOpacity);
       } else {
-        fill(100);
+        fill(100, 100, 100, arrowOpacity);
       }
       translate(averageX, averageY);
       rotate(-atan2(gate2.xPos-gate1.xPos, gate2.yPos-gate1.yPos));
@@ -135,13 +142,27 @@ function gateLamp(trueConnections, inputs, gate) {
   return(gateAND(trueConnections, inputs))
 }
 function gateButton(trueConnections, inputs, gate) {
-  var isSelected = dist(Wmouse[0],Wmouse[1],gate.xPos,gate.yPos) < 50 && mouseIsPressed && mouseButton === LEFT;
+  var isSelected = dist(Wmouse[0],Wmouse[1],gate.xPos,gate.yPos) < gateSize/2 && mouseIsPressed && mouseButton === LEFT;
   if (isSelected) {
     dragging = false;
   }
   return(isSelected);
 }
-typesF = [gateAND, gateOR, gateNAND, gateNOR, gateXOR, gateNXOR, gateLamp, gateButton];
+function gateSwitch(trueConnections, inputs, gate) {
+  var isPressed = gateButton(trueConnections, inputs, gate);
+  if (gate.wasPressed === undefined) {
+    gate.wasPressed = isPressed;
+  } else if (isPressed) {
+    if (gate.wasPressed === false) {
+      gate.value = !gate.value;
+      gate.wasPressed = true;
+    }
+  } else {
+    gate.wasPressed = false;
+  }
+  return(gate.value);
+}
+typesF = [gateAND, gateOR, gateNAND, gateNOR, gateXOR, gateNXOR, gateLamp, gateButton, gateSwitch];
 
 function calcGate(gateType, trueConnections, inputs, gate) {
   return(typesF[gateType](trueConnections, inputs, gate));
@@ -168,8 +189,10 @@ function renderAll() {
   for (var i = 0; i < gates.length; i++) {
     gates[i].render();
   }
-  for (var i = 0; i < connections.length; i++) {
-    connections[i].render();
+  if (connectionsVisible === true) {
+    for (var i = 0; i < connections.length; i++) {
+      connections[i].render();
+    }
   }
 }
 
@@ -283,22 +306,22 @@ function keyPressed() {
     tutorial();
   }
   else if (keyCode === 87) { // w move gates up;
-    moveSelectedGates(0, -100);
+    moveSelectedGates(0, -gateSize);
   }
   else if (keyCode === 83) { // s move gates down
-    moveSelectedGates(0, 100);
+    moveSelectedGates(0, gateSize);
   }
   else if (keyCode === 65) { // a move left
-    moveSelectedGates(-100, 0);
+    moveSelectedGates(-gateSize, 0);
   }
   else if (keyCode === 68) { // d move right
-    moveSelectedGates(100, 0);
+    moveSelectedGates(gateSize, 0);
   }
   // return false; // prevent any default behaviour
 }
 function isPressingGate() {
   for (var i = 0; i < gates.length; i++) {
-    if (dist(Wmouse[0],Wmouse[1],gates[i].xPos,gates[i].yPos) < 50) {
+    if (dist(Wmouse[0],Wmouse[1],gates[i].xPos,gates[i].yPos) < gateSize/2) {
       return([true, i]);
     }
   }
@@ -306,11 +329,11 @@ function isPressingGate() {
 }
 function newGate() {
   for (var i = 0; i < gates.length; i++) {
-    if (gates[i].xPos === round(Wmouse[0]/100)*100 && gates[i].yPos === round(Wmouse[1]/100)*100) {
+    if (gates[i].xPos === round(Wmouse[0]/gateSize)*gateSize && gates[i].yPos === round(Wmouse[1]/gateSize)*gateSize) {
       return(false);
     }
   }
-  gates.push(new gate(round(Wmouse[0]/100)*100, round(Wmouse[1]/100)*100, 0));
+  gates.push(new gate(round(Wmouse[0]/gateSize)*gateSize, round(Wmouse[1]/gateSize)*gateSize, 0));
   select(gates.length-1);
 }
 function doConnection(gate1, gate2) {
@@ -390,7 +413,7 @@ function tutorial() {
   addPopup('Press F to cycle the types of all selected gates (gates that are placed are selected by default).');
   addPopup('Press Q to make a connection from the first selected gate to all other selected gates. You can always press Q again to undo this.');
   addPopup('Press R to reset all gate states to 0/false/off or press T to view this tutorial again.');
-  addPopup('This is version Beta 1.2.1, changes and improvements are happening all the time.');
+  addPopup('This is version ' + version + ', changes and improvements are happening all the time.');
   addPopup('Copy/pasting is coming soon, just like saving your curcuits and an undo option.');
   addPopup('This program was made by: CodeMaker4');
 }
@@ -428,9 +451,9 @@ function moveSelectedGates(xMovement, yMovement) {
 function setup() { // p5.js setup
   createCanvas(xScreenSize, yScreenSize); // make new canvas to draw on
   noSmooth();
-  typesI = [loadImage('gateImages/AND.png'), loadImage('gateImages/OR.png'), loadImage('gateImages/NAND.png'), loadImage('gateImages/NOR.png'), loadImage('gateImages/XOR.png'), loadImage('gateImages/NXOR.png'), loadImage('gateImages/hollow.png'), loadImage('gateImages/button.png')]; // list tat stores all gate types with images.
+  typesI = [loadImage('gateImages/AND.png'), loadImage('gateImages/OR.png'), loadImage('gateImages/NAND.png'), loadImage('gateImages/NOR.png'), loadImage('gateImages/XOR.png'), loadImage('gateImages/NXOR.png'), loadImage('gateImages/hollow.png'), loadImage('gateImages/button.png'), loadImage('gateImages/switch.png')]; // list tat stores all gate types with images.
   for (var i = 0; i < 10; i++) {
-    gates.push(new gate( round(random(-4,4))*100, round(random(-4,4))*100, i%typesI.length));
+    gates.push(new gate( round(random(-4,4))*gateSize, round(random(-4,4))*gateSize, i%typesI.length));
   }
   for (var i = 0; i < 10; i ++) {
     connections.push(new connection(floor(random(gates.length)), floor(random(gates.length))));
@@ -465,10 +488,10 @@ function draw() { // main loop
     rect(selectingStart[0], selectingStart[1], Wmouse[0], Wmouse[1]);
   } else {
     rectMode(CENTER);
-    fill(0,50,0,100);
+    fill(0,0,0,0);
     stroke(127,127,127,100);
     strokeWeight(10);
-    rect(round(Wmouse[0]/100)*100, round(Wmouse[1]/100)*100, 100, 100);
+    rect(round(Wmouse[0]/gateSize)*gateSize, round(Wmouse[1]/gateSize)*gateSize, gateSize, gateSize);
   }
 
   translate(-viewX,-viewY);
@@ -479,6 +502,12 @@ function draw() { // main loop
   for (var i = popups.length-1; i >= 0; i--) {
     popups[i].render();
   }
+
+  textSize(15);
+  fill(127,255);
+  noStroke()
+  textAlign(RIGHT, BOTTOM)
+  text('JSlogics by Codemaker4. Version ' + version + '.', xScreenSize, yScreenSize);
 
   counter ++; // increment counter
 }
