@@ -46,6 +46,10 @@ function smoothChange(now, goal, iterations) { // a = smoothChange(a, 10, 10)   
   return(now+((goal-now)/iterations));
 }
 
+function sqrDist(x1,y1,x2,y2) {
+  return(pow(x2-x1, 2) + pow(y2-y1, 2));
+}
+
 function relMouse(obToControll) {
   return([onWMouseX - obToControll.xPos , onWMouseY - obToControll.yPos]);
 }
@@ -62,17 +66,14 @@ function spawnPath() {
 }
 
 function despawnPaths() {
-  for (var i = 0; i < paths.length; i++) {
-    if (dist(paths[i].xPos, paths[i].yPos, playedPlayer.xPos, playedPlayer.yPos) > pathDespawnDist) {
-      paths.splice(i,1);
-      i -= 1;
-    }
+  if (dist(paths[0].xPos, paths[0].yPos, playedPlayer.xPos, playedPlayer.yPos) > pathDespawnDist) {
+    paths.splice(0,1);
   }
 }
 
 function killIfOffPath() {
   for (var i = 0; i < paths.length; i++) {
-    if (dist(paths[i].xPos, paths[i].yPos, playedPlayer.xPos, playedPlayer.yPos) < paths[i].size/2) {
+    if (sqrDist(paths[i].xPos, paths[i].yPos, playedPlayer.xPos, playedPlayer.yPos) < pow(paths[i].size/2 , 2)) {
       return(false);
     }
   }
@@ -92,11 +93,15 @@ function respawn() {
 }
 
 function pathTick() {
-  while (dist(playedPlayer.xPos, playedPlayer.yPos, pathSpawnX, pathSpawnY) < pathCreateDist) {
-    spawnPath();
+  if (counter % 9 == 0) {
+    while (dist(playedPlayer.xPos, playedPlayer.yPos, pathSpawnX, pathSpawnY) < pathCreateDist) {
+      spawnPath();
+    }
+  } else if (counter % 9 == 3) {
+    despawnPaths();
+  } else if (counter % 9 == 6) {
+    killIfOffPath();
   }
-  despawnPaths();
-  killIfOffPath();
 }
 
 function player(_xPos, _yPos,_Mass, _Torque, _Friction) {
