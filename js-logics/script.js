@@ -1,6 +1,6 @@
 var xScreenSize = innerWidth - 5; // canvas size
 var yScreenSize = innerHeight - 5;
-var version = 'Beta 1.3.2';
+var version = 'Beta 1.4';
 var gateSize = 100;
 var connectionsVisible = true;
 var connectionOpacity = 127;
@@ -11,17 +11,26 @@ var viewZoom = 1.0;
 var counter = 0; // loop counter counts ammountof times the main loop has been executed.
 var gates = []; // list that keeps all the gates.
 var connections = []; // list that keeps all the connections
+var backup = ['','']; // list containing lists containng connections and gates before last action.
 var popups = [];
 var typesF = []; // list tat stores all gate types with cumputation functions.
 var typesI = []; // list tat stores all gate types with images.
 var ticksToBeDone = 0;
 var ticksPerFrame = 1/3; // 20 tps (at 60 fps)
+var backupWasDone = false;
 var popupPadding = 10;
 var popupTextSize = 30;
 
 // tickALgorithim complexity = gates*2 + connections
 
 document.addEventListener('contextmenu', event => event.preventDefault()); // prevent rightclick menu to make rihtclick control less annoying to use.
+
+var JSLeerder = localStorage.getItem("JSLeerder"); // checks if game was played earlier
+if (JSLeerder != "ja"){
+  localStorage.setItem("JSLeerder", "ja"); // set local storage to default
+  localStorage.setItem("JSLsaveGates", '');
+  localStorage.setItem("JSLsaveConns", '');
+}
 
 function isPosit(x) { // returns true if x is 0 or higher
   return (x>=0); // statement that makes boolean
@@ -32,17 +41,19 @@ function posit(x) { // returns positive number
   return(-x); // return negative input
 }
 
-function gate(initX, initY, type) {
-  this.xPos = initX; // x position of center of dot
-  this.yPos = initY; // y position of center of dot
-  this.size = size; // size/diameter of dor
-  this.gateType = type;
-  this.value = false;
-  this.totalInputs = 0;
-  this.trueInputs = 0;
-  this.selected = false;
-  this.rotation = 0;
-  this.render = function() { // graphics, no calculations.
+class gate {
+  constructor(initX, initY, type, initVal) {
+    this.xPos = initX; // x position of center of dot
+    this.yPos = initY; // y position of center of dot
+    this.size = size; // size/diameter of dor
+    this.gateType = type;
+    this.value = initVal;
+    this.totalInputs = 0;
+    this.trueInputs = 0;
+    this.selected = false;
+    this.rotation = 0;
+  }
+  render() { // graphics, no calculations.
     push();
       if (this.selected === true) {
         stroke(0,0,255);
@@ -68,13 +79,15 @@ function gate(initX, initY, type) {
   }
 }
 
-function popUp(x,y,xSize,ySize,popupText) {
-  this.xPos = x;
-  this.yPos = y;
-  this.xSize = xSize;
-  this.ySize = ySize;
-  this.popupText = popupText;
-  this.render = function() {
+class popUp {
+  constructor(x,y,xSize,ySize,popupText) {
+    this.xPos = x;
+    this.yPos = y;
+    this.xSize = xSize;
+    this.ySize = ySize;
+    this.popupText = popupText;
+  }
+  render() {
     rectMode(CORNER);
     stroke(255,255,255,255);
     strokeWeight(5);
@@ -88,11 +101,13 @@ function popUp(x,y,xSize,ySize,popupText) {
   }
 }
 
-function connection(comesFrom, goesTo) {
-  this.connectionStart = comesFrom;
-  this.connectionEnd = goesTo;
-  this.color = color(random(50,200), random(50,200), random(50,200),connectionOpacity);
-  this.render = function() {
+class connection {
+  constructor(comesFrom, goesTo) {
+    this.connectionStart = comesFrom;
+    this.connectionEnd = goesTo;
+    this.color = color(random(50,200), random(50,200), random(50,200),connectionOpacity);
+  }
+  render() {
     stroke(this.color);
     strokeWeight(5);
     var gate1 = gates[this.connectionStart];
@@ -262,6 +277,7 @@ function onWorldMouse() {
 }
 function keyPressed() {
   if (keyCode === 82) { // r reset values
+    doBackup();
     for (var i = 0; i < gates.length; i++) {
       if (gates[i].selected) {
         gates[i].rotation += 1;
@@ -281,6 +297,7 @@ function keyPressed() {
     firstSelected = undefined;
   }
   else if (keyCode === 69) { // e reset selection
+    doBackup();
     for (var i = 0; i < gates.length; i++) {
       gates[i].selected = false;
       firstSelected = undefined;
@@ -296,6 +313,7 @@ function keyPressed() {
     }
   }
   else if (keyCode === 70) { // f cycle type of selected gates
+    doBackup();
     for (var i = 0; i < gates.length; i++) {
       if (gates[i].selected === true) {
         gates[i].gateType += 1;
@@ -307,6 +325,9 @@ function keyPressed() {
   }
   else if (keyCode === 90) { // z newGate
     newGate();
+  }
+  else if (keyCode === 66) { // b loadBackup/undo
+    loadBackup();
   }
   else if (keyCode === 84) { // t tutorial.
     tutorial();
@@ -322,6 +343,14 @@ function keyPressed() {
   }
   else if (keyCode === 68) { // d move right
     moveSelectedGates(gateSize, 0);
+  }
+  else if (keyCode === 75) { // k saveToLocalStorage
+    saveToLocalStorage();
+    addPopup("World saved. Press L to load it later.");
+  }
+  else if (keyCode === 76) { // l loadFromLocalStorage
+    loadFromLocalStorage();
+    addPopup('Saved world loaded. Press B to restore your old world.');
   }
   // return false; // prevent any default behaviour
 }
@@ -339,13 +368,14 @@ function newGate() {
       return(false);
     }
   }
-  gates.push(new gate(round(Wmouse[0]/gateSize)*gateSize, round(Wmouse[1]/gateSize)*gateSize, 0));
+  gates.push(new gate(round(Wmouse[0]/gateSize)*gateSize, round(Wmouse[1]/gateSize)*gateSize, 0, false));
   select(gates.length-1);
 }
 function doConnection(gate1, gate2) {
   if (gate1 === gate2) {
     return(false);
   }
+  doBackup();
   for (var i = 0; i < connections.length; i++) {
     if (connections[i].connectionStart === gate1 && connections[i].connectionEnd === gate2) {
       connections.splice(i,1);
@@ -359,6 +389,7 @@ function doConnection(gate1, gate2) {
   connections.push(new connection(gate1, gate2));
 }
 function removeGate(gateID) {
+  doBackup();
   for (var i = 0; i < connections.length; i++) {
     if (connections[i].connectionStart === gateID || connections[i].connectionEnd === gateID) {
       connections.splice(i,1);
@@ -368,7 +399,8 @@ function removeGate(gateID) {
   for (var i = 0; i < connections.length; i++) {
     if (connections[i].connectionStart > gateID) {
       connections[i].connectionStart -= 1;
-    } if (connections[i].connectionEnd > gateID) {
+    }
+    if (connections[i].connectionEnd > gateID) {
       connections[i].connectionEnd -= 1;
     }
   }
@@ -399,6 +431,22 @@ function selectDrag(startPos, endPos) {
     }
   }
 }
+function doBackup() {
+  if (backupWasDone === false) {
+    balckup = ['',''];
+    backup[0] = JSON.stringify(gates);
+    backup[1] = JSON.stringify(connections);
+    backupWasDone = true;
+  }
+}
+function loadBackup() {
+  var oldGates = JSON.stringify(gates);
+  var oldConnections = JSON.stringify(connections);
+  importJSONStrings(backup[0], backup[1]);
+  backup[0] = oldGates;
+  backup[1] = oldConnections;
+
+}
 function addPopup(popupText) {
   var popupSize = sqrt(popupText.length*1.1)*popupTextSize/2;
   if (popupSize*2 >= xScreenSize-20) {
@@ -417,10 +465,11 @@ function tutorial() {
   addPopup('You can move selected gates with WASD. Holding W, A, S or D does not work.')
   addPopup('Press Z to place a new gate or press E to unselect everything');
   addPopup('Press F to cycle the types of all selected gates (gates that are placed are selected by default).');
-  addPopup('Press Q to make a connection from the first selected gate to all other selected gates. You can always press Q again to undo this.');
+  addPopup('Press Q to make a connection from the first selected gate to all other selected gates. B is the undo button. (stands for Backup)');
+  addPopup('Press K to save your world, and press L to load it later. Now only 1 local save is supported.');
   addPopup('Press R to rotate all selected gates 90 degrees clockwise or press T to view this tutorial again.');
   addPopup('This is version ' + version + ', changes and improvements are happening all the time.');
-  addPopup('Copy/pasting is coming soon, just like saving your curcuits and an undo option.');
+  addPopup('Copy/pasting is coming soon, just like sharing your curcuits and multiple local saves.');
   addPopup('This program was made by: CodeMaker4');
 }
 function checkMovingPossible(gateToBechecked, xMovement, yMovement) {
@@ -453,17 +502,36 @@ function moveSelectedGates(xMovement, yMovement) {
     }
   }
 }
+function importJSONStrings(gatesString, connectionsString) {
+  gates = JSON.parse(gatesString);
+  connections = JSON.parse(connectionsString);
+  for (var i = 0; i < gates.length; i++) {
+    gates[i] = new gate(gates[i].xPos, gates[i].yPos, gates[i].gateType, gates[i].value);
+  }
+  for (var i = 0; i < connections.length; i++) {
+    connections[i] = new connection(connections[i].connectionStart, connections[i].connectionEnd);
+  }
+}
+function saveToLocalStorage() {
+  localStorage.setItem("JSLsaveGates", JSON.stringify(gates));
+  localStorage.setItem("JSLsaveConns", JSON.stringify(connections));
+}
+function loadFromLocalStorage() {
+  doBackup();
+  importJSONStrings(localStorage.getItem("JSLsaveGates"), localStorage.getItem("JSLsaveConns"));
+}
 
 function setup() { // p5.js setup
   createCanvas(xScreenSize, yScreenSize); // make new canvas to draw on
   noSmooth();
   typesI = [loadImage('gateImages/AND.png'), loadImage('gateImages/OR.png'), loadImage('gateImages/NAND.png'), loadImage('gateImages/NOR.png'), loadImage('gateImages/XOR.png'), loadImage('gateImages/NXOR.png'), loadImage('gateImages/hollow.png'), loadImage('gateImages/button.png'), loadImage('gateImages/switch.png')]; // list tat stores all gate types with images.
   for (var i = 0; i < 10; i++) {
-    gates.push(new gate( round(random(-4,4))*gateSize, round(random(-4,4))*gateSize, i%typesI.length));
+    gates.push(new gate( round(random(-4,4))*gateSize, round(random(-4,4))*gateSize, i%typesI.length, false));
   }
   for (var i = 0; i < 10; i ++) {
     connections.push(new connection(floor(random(gates.length)), floor(random(gates.length))));
   }
+  doBackup();
   addPopup('press T for a tutorial, click anywhere to close this message.')
 }
 
@@ -471,6 +539,7 @@ var Wmouse = [0,0];
 
 function draw() { // main loop
   Wmouse = onWorldMouse();
+  backupWasDone = false;
 
   ticksToBeDone += ticksPerFrame;
   while (ticksToBeDone >= 1) {
@@ -511,8 +580,8 @@ function draw() { // main loop
 
   textSize(15);
   fill(127,255);
-  noStroke()
-  textAlign(RIGHT, BOTTOM)
+  noStroke();
+  textAlign(RIGHT, BOTTOM);
   text('JSlogics by Codemaker4. Version ' + version + '.', xScreenSize, yScreenSize);
 
   counter ++; // increment counter
