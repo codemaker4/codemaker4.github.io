@@ -1,4 +1,15 @@
-class player {
+function playerRender(obToControll) {
+  if (obToControll.xPos + playerSize - cameraX > 0 && obToControll.yPos + playerSize - cameraY > 0 && obToControll.xPos - playerSize - cameraX < xScreenSize && obToControll.yPos - playerSize - cameraY < yScreenSize) {
+    push();
+      translate(cameraX + (obToControll.xPos - cameraX), cameraY + (obToControll.yPos - cameraY)); // move (0,0) to me
+      rotate(-obToControll.fireDirection + PI); // rotate me
+      tint(obToControll.hue, obToControll.health*2, 50);
+      image(playerTextures[obToControll.playerLook], 0, -playerSize/2, playerSize, playerSize*2); // render me
+    pop(); // leave render settings as if obToControll never happened
+  }
+}
+
+class AIPlayer {
   constructor(_xPos, _yPos, _hue) {
     this.xPos = _xPos;
     this.yPos = _yPos;
@@ -9,6 +20,7 @@ class player {
     this.health = playerHealth;
     this.turnDirection = HALF_PI;
     this.fireDirection = 0;
+    this.playerLook = floor(random(0,playerTextures.length));
   }
   tick() {
     var closestPlayerID = undefined; // find closest enemy
@@ -57,14 +69,58 @@ class player {
     }
   }
   render(){
-    if (this.xPos + playerSize - cameraX > 0 && this.yPos + playerSize - cameraY > 0 && this.xPos - playerSize - cameraX < xScreenSize && this.yPos - playerSize - cameraY < yScreenSize) {
-      push();
-        translate(cameraX + (this.xPos - cameraX), cameraY + (this.yPos - cameraY)); // move (0,0) to me
-        rotate(-this.fireDirection); // rotate me
-        fill(this.hue, this.health, 50); // pick my color
-        rect(0, 0, playerSize, playerSize); // render me
-      pop(); // leave render settings as if this never happened
+    playerRender(this);
+  }
+}
+
+class humanPlayer {
+  constructor(_xPos, _yPos, _hue) {
+    this.xPos = _xPos;
+    this.yPos = _yPos;
+    this.xSpeed = 0;
+    this.ySpeed = 0;
+    this.hue = _hue;
+    this.reload = 0;
+    this.health = playerHealth;
+    this.fireDirection = 0;
+    this.playerLook = floor(random(0,playerTextures.length));
+  }
+  tick() {
+    if (keyIsDown(87)) { // W
+      this.ySpeed -= walkSpeed;
+    } else if (keyIsDown(83)) { // S
+      this.ySpeed += walkSpeed;
     }
+    if (keyIsDown(65)) { // A
+      this.xSpeed -= walkSpeed;
+    } else if (keyIsDown(68)) { // D
+      this.xSpeed += walkSpeed;
+    }
+
+    this.fireDirection = atan2(-((mouseX+cameraX)-(xScreenSize/2)), -((mouseY+cameraY)-(yScreenSize/2)));
+    if (this.reload <= 0 && mouseIsPressed) { // if can fire
+      fireBullet(this.xPos, this.yPos, this.fireDirection, this.hue); // fire bullet
+      this.reload = reloadTime; // start reloading
+    }
+
+    for (var i = 0; i < bullets.length; i ++) { // loop trought bullets
+      if (bullets[i].hue !== this.hue && SQdist(this.xPos, this.yPos, bullets[i].xPos, bullets[i].yPos) < sq(playerSize/2)) { // if bullet is not mine
+        this.health -= 10; // take damage
+        bullets[i].timeLeft = 0; // kill bullet
+      }
+    }
+
+    this.xPos += this.xSpeed; // move (step)
+    this.yPos += this.ySpeed;
+    this.xSpeed = this.xSpeed*playerFriction; // friction
+    this.ySpeed = this.ySpeed*playerFriction;
+    this.reload -= 1; // continue reloading
+    // if (this.health < 100) { // regenerate
+    //   this.health += 0.1;
+    // }
+  }
+  render(){
+    playerRender(this);
   }
 }
 
