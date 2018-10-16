@@ -30,10 +30,6 @@ var particles = [];
 
 var zoom = 2;
 
-function isPosit(x) { // returns true if x is 0 or higher
-  return (x>=0);
-}
-
 function SQdist(x1,y1,x2,y2) { // returns distances between 2 objects (objects need .x and .y properties for this to work)
   return(sq(x2-x1) + sq(y2-y1));
 }
@@ -92,6 +88,14 @@ function drawBackground() { // renders the background tiles
   for (var x = cameraX-(cameraX%backGroundTileSize)-backGroundTileSize; x < cameraX+xScreenSize; x += backGroundTileSize) {
     for (var y = cameraY-(cameraY%backGroundTileSize)-backGroundTileSize; y < cameraY+yScreenSize; y += backGroundTileSize) {
       image(neonTile, x , y, backGroundTileSize, backGroundTileSize);
+    }
+  }
+}
+
+function keyPressed() {
+  if (keyCode == 32) {
+    if (players[cameraFollows].isPlayer !== true) {
+      humanPlayerSpawnRequest = true;
     }
   }
 }
@@ -176,18 +180,18 @@ function draw() { // loop
   }
   // fill(0);
   // rect(0,0,10,10);
-  if (frameCount%60 == 1) {
-    nowFramerate = round(frameRate());
-    if (nowFramerate < 40 && myNowPixelDensity > 0.21) {
-      myNowPixelDensity -= 0.1;
-      pixelDensity(myNowPixelDensity);
-    } else if (nowFramerate > 50 && myNowPixelDensity < 1) {
-      myNowPixelDensity += 0.1;
-      pixelDensity(myNowPixelDensity);
-    }
-  }
-  fill(255);
-  textSize(100);
-  text(nowFramerate,cameraX,cameraY+100)
+  // if (frameCount%60 == 1) {
+  //   nowFramerate = round(frameRate());
+  //   if (nowFramerate < 40 && myNowPixelDensity > 0.21) {
+  //     myNowPixelDensity -= 0.1;
+  //     pixelDensity(myNowPixelDensity);
+  //   } else if (nowFramerate > 50 && myNowPixelDensity < 1) {
+  //     myNowPixelDensity += 0.1;
+  //     pixelDensity(myNowPixelDensity);
+  //   }
+  // }
+  // fill(255);
+  // textSize(100);
+  // text(nowFramerate,cameraX,cameraY+100)
   framesSinceLastKill += 1;
 }

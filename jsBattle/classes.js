@@ -24,6 +24,7 @@ class AIPlayer {
     this.closestPlayerSQDist = Infinity;
     this.playerLook = floor(random(0,playerTextures.length));
     this.frameOffset = floor(random(60));
+    this.isPlayer = false;
   }
   tick() {
     if ((frameCount+this.frameOffset)%30 == 0) {
@@ -88,6 +89,7 @@ class humanPlayer {
     this.health = playerHealth;
     this.fireDirection = 0;
     this.playerLook = floor(random(0,playerTextures.length));
+    this.isPlayer = true;
   }
   tick() {
     if (keyIsDown(87)) { // W
@@ -101,7 +103,7 @@ class humanPlayer {
       this.xSpeed += walkSpeed;
     }
 
-    this.fireDirection = atan2(-((mouseX+cameraX)-(xScreenSize/2)), -((mouseY+cameraY)-(yScreenSize/2)));
+    this.fireDirection = atan2((mouseX*zoom)+cameraX-this.xPos, (mouseY*zoom)+cameraY-this.yPos);
     if (this.reload <= 0 && mouseIsPressed) { // if can fire
       fireBullet(this.xPos, this.yPos, this.fireDirection, this.hue); // fire bullet
       this.reload = reloadTime; // start reloading
