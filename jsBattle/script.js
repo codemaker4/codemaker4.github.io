@@ -18,6 +18,8 @@ var nowFramerate = 0;
 var myNowPixelDensity = 1;
 var nowBackgroundHue = 0;
 var framesSinceLastKill = 0;
+var averageFPS = 60;
+var fastMode = false;
 
 var grassTile;
 var stoneTile;
@@ -67,8 +69,14 @@ function fireBullet(xPos, yPos, direction, hue) { // summons a new bullet
 }
 
 function spreadParticles(xPos, yPos, hue) { // summs 10 partices slowly moving away from the origin an dfading away
-  for (var i = 0; i < 10; i++) {
-    particles[particles.length] = new particle(xPos, yPos, random(TWO_PI), hue);
+  if (fastMode) {
+    for (var i = 0; i < 5; i++) {
+      particles[particles.length] = new particle(xPos, yPos, random(TWO_PI), hue);
+    }
+  } else {
+    for (var i = 0; i < 20; i++) {
+      particles[particles.length] = new particle(xPos, yPos, random(TWO_PI), hue);
+    }
   }
 }
 
@@ -83,8 +91,12 @@ function doCamera() { // calculates the camera
 }
 
 function drawBackground() { // renders the background tiles
-  nowBackgroundHue = hue(lerpColor(color(nowBackgroundHue, 100, 50), color(players[cameraFollows].hue, 100, 50), framesSinceLastKill/10000));
-  tint(nowBackgroundHue, 100, 50);
+  if (!fastMode) {
+    nowBackgroundHue = hue(lerpColor(color(nowBackgroundHue, 100, 50), color(players[cameraFollows].hue, 100, 50), framesSinceLastKill/2000));
+    tint(nowBackgroundHue, 100, 50);
+  } else {
+    noTint();
+  }
   for (var x = cameraX-(cameraX%backGroundTileSize)-backGroundTileSize; x < cameraX+xScreenSize; x += backGroundTileSize) {
     for (var y = cameraY-(cameraY%backGroundTileSize)-backGroundTileSize; y < cameraY+yScreenSize; y += backGroundTileSize) {
       image(neonTile, x , y, backGroundTileSize, backGroundTileSize);
@@ -178,20 +190,18 @@ function draw() { // loop
       i --; // shift loop variable to compensate for the deleted item
     }
   }
-  // fill(0);
-  // rect(0,0,10,10);
-  // if (frameCount%60 == 1) {
-  //   nowFramerate = round(frameRate());
-  //   if (nowFramerate < 40 && myNowPixelDensity > 0.21) {
-  //     myNowPixelDensity -= 0.1;
-  //     pixelDensity(myNowPixelDensity);
-  //   } else if (nowFramerate > 50 && myNowPixelDensity < 1) {
-  //     myNowPixelDensity += 0.1;
-  //     pixelDensity(myNowPixelDensity);
-  //   }
-  // }
-  // fill(255);
-  // textSize(100);
-  // text(nowFramerate,cameraX,cameraY+100)
+  averageFPS = ((averageFPS*19)+frameRate())/20;
+  if (averageFPS < 30) {
+    fastMode = true;
+  } else if (averageFPS > 59) {
+    fastMode = false;
+  }
+  if (humanPlayerSpawnRequest) {
+    console.log(frameCount);
+    fill(frameCount%100,100,50);
+    stroke(0);
+    textSize(100);
+    text("Waiting for a spot in the map...",cameraX,cameraY+100);
+  }
   framesSinceLastKill += 1;
 }

@@ -3,7 +3,11 @@ function playerRender(obToControll) {
     push();
       translate(cameraX + (obToControll.xPos - cameraX), cameraY + (obToControll.yPos - cameraY)); // move (0,0) to me
       rotate(-obToControll.fireDirection + PI); // rotate me
-      tint(obToControll.hue, obToControll.health*2, 50);
+      if (!fastMode) {
+        tint(obToControll.hue, obToControll.health*2, 50);
+      } else {
+        noTint();
+      }
       image(playerTextures[obToControll.playerLook], 0, -playerSize/2, playerSize, playerSize*2); // render me
     pop(); // leave render settings as if obToControll never happened
   }
@@ -146,7 +150,11 @@ class bullet{
   }
   render() {
     if (onScreen(this)) {
-      fill(this.hue,100,50,this.timeLeft); // render
+      if (!fastMode) {
+        fill(this.hue,100,50,this.timeLeft); // render
+      } else {
+        fill(127);
+      }
       rect(this.xPos, this.yPos, bulletSize, bulletSize);
     }
   }
@@ -166,7 +174,11 @@ class particle{
     this.yPos += this.ySpeed;
     this.timeLeft -= 1; // age
     if (onScreen(this)) {
-      fill(this.hue, this.timeLeft, 50, this.timeLeft); // render
+      if (!fastMode) {
+        fill(this.hue, this.timeLeft, 50, this.timeLeft); // render
+      } else {
+        fill(127);
+      }
       rect(this.xPos, this.yPos, bulletSize, bulletSize);
     }
   }
