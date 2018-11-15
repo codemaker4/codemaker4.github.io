@@ -18,7 +18,9 @@ var mouseWasClicked = false;
 
 function button(butX, butY, butW, butH, img) {
   rect(butX, butY, butW, butH);
+  noSmooth();
   image(img, butX+((butW-20)/2)+10, butY+((butH-20)/2)+10, min(butW-20, butH-20), min(butW-20, butH-20));
+  smooth();
   if (mouseWasClicked && mouseX > butX && mouseX < butX+butW && mouseY > butY && mouseY < butY+butH) {
     mouseWasClicked = false;
     return true;
@@ -58,8 +60,8 @@ function mouseClicked() {
   mouseWasClicked = true;
 }
 
-function mouseWheel(event) {
-  scrollVal -= event.delta;
+function mouseDragged(event) {
+  scrollVal += mouseY-pmouseY;
   if (scrollVal > 0) {
     scrollVal = 0;
   }
@@ -67,7 +69,6 @@ function mouseWheel(event) {
 
 function setup() { // p5 setup
   createCanvas(xScreenSize, yScreenSize);
-  noSmooth();
   imageMode(CENTER)
   colors = [color(255,0,0), color(255,255,0), color(0,255,0), color(0,255,255), color(0,0,255), color(255,0,255)];
 
