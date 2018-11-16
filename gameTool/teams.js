@@ -11,22 +11,25 @@ class team{
     this.score = 0;
   }
   renderBar(barX, barY, barW, barH) {
-    fill(this.color);
-    noStroke();
-    rect(barX, barY, barW, barH);
+    if (screenUpdateNeeded) {
+      fill(this.color);
+      noStroke();
+      rect(barX, barY, barW, barH);
 
-    var teamText = this.name + ". Score: " + this.score.toString() + ". Members: ";
-    if (this.members.length != 0) {
-      for (var i = 0; i < this.members.length; i ++) {
-        teamText += this.members[i]
-        if (i < this.members.length-1) {
-          teamText += ", "
+      var teamText = this.name + ". Score: " + this.score.toString() + ". Members: ";
+      if (this.members.length != 0) {
+        for (var i = 0; i < this.members.length; i ++) {
+          teamText += this.members[i]
+          if (i < this.members.length-1) {
+            teamText += ", "
+          }
         }
       }
+      fill(this.textColor);
+      textSize(50);
+      text(teamText, barX, barY, barW-barH, barH);
+
     }
-    fill(this.textColor);
-    textSize(50);
-    text(teamText, barX, barY, barW-barH, barH);
 
     fill(255,255,255);
     stroke(0);
@@ -45,21 +48,23 @@ class team{
     }
   }
   renderSettings() {
-    background(this.color);
+    if (screenUpdateNeeded) {
+      background(this.color);
 
-    fill(this.textColor);
-    noStroke();
-    textSize(50);
-    var teamText = this.name + ". Score: " + this.score.toString() + ". Members: ";
-    if (this.members.length != 0) {
-      for (var i = 0; i < this.members.length; i ++) {
-        teamText += this.members[i]
-        if (i < this.members.length-1) {
-          teamText += ", "
+      fill(this.textColor);
+      noStroke();
+      textSize(50);
+      var teamText = this.name + ". Score: " + this.score.toString() + ". Members: ";
+      if (this.members.length != 0) {
+        for (var i = 0; i < this.members.length; i ++) {
+          teamText += this.members[i]
+          if (i < this.members.length-1) {
+            teamText += ", "
+          }
         }
       }
+      text(teamText,0,0,xScreenSize,yScreenSize-(xScreenSize));
     }
-    text(teamText,0,0,xScreenSize,yScreenSize-(xScreenSize));
 
     fill(0,255,0);
     stroke(0);
