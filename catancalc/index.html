@@ -6,29 +6,70 @@
   </head>
   <body>
     <table style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; height: 100%; width: 100%;">
-      <tr style="height: 50%; width: 100%">
-        <td><button type="button" id="check" style="height: 100%; width: 100%; backGround-color: #0F0; font-size: 10vw;" onclick="checkIfTaken();">controleer</button></td>
+      <tr>
+        <td style="height: 50%; width: 50%"><button type="button" id="activate" style="height: 100%; width: 100%; backGround-color: #0F0; font-size: 10vw;" onclick="activateBuilding();">activeren</button></td>
+        <td style="height: 50%; width: 50%"><button type="button" id="check" style="height: 100%; width: 100%; backGround-color: #F00; font-size: 10vw;" onclick="check();">controleren</button></td>
       </tr>
-      <tr style="height: 50%; width: 100%">
-        <td><button type="button" style="height: 100%; width: 100%; background-color: #F00; font-size: 10vw;" onclick="reset();">reset</button><td>
+      <tr>
+        <td style="height: 50%; width: 50%"><button type="button" id="doRound" style="height: 100%; width: 100%; background-color: #00F; font-size: 10vw;" onclick="doRound();">doe ronde</button></td>
+        <td style="height: 50%; width: 50%"><button type="button" id="random" style="height: 100%; width: 100%; background-color: #FF0; font-size: 10vw;" onclick="doRandom();">random</button></td>
       </tr>
     </table>
   </body>
   <script type="text/javascript">
-    var takenThings = [];
-    function checkIfTaken() {
-      id = prompt("geef de ID", "");
-      if (id === null) {return;}
-      if (takenThings.includes(id)) {
-        document.getElementById('check').style.backgroundColor = '#F00';
-      } else {
-        document.getElementById('check').style.backgroundColor = '#0F0';
-        takenThings.push(id);
+    var activatedBuildings = [];
+    class activatedBuilding {
+      constructor(id) {
+        this.id = id;
+        this.unusedRounds = 0;
       }
     }
-    function reset() {
-      takenThings = [];
-      document.getElementById('check').style.backgroundColor = '#0F0';
+    function activateBuilding() {
+      id = prompt("geef de ID van het nieuwe gebouw.")
+      if (id === null) {
+        return;
+      }
+      activatedBuildings.push(new activatedBuilding(id));
+    }
+
+    function check() {
+      id = prompt("geef de ID van het gebouw.")
+      if (id === null) {
+        return;
+      }
+      var foundBuilding = false;
+      for (var i = 0; i < activatedBuildings.length; i++) {
+        if (activatedBuildings[i].id == id) {
+          alert("Dit gebouw heeft " + activatedBuildings[i].unusedRounds.toString() + " ronde(s) gemist.");
+          activatedBuildings[i].unusedRounds = 0;
+          foundBuilding = true;
+          break;
+        }
+      }
+      if (!foundBuilding) {
+        alert("Gebouw '" + id + "' bestaat niet of is nog niet geactiveerd.");
+      }
+    }
+
+    var doRoundResetTimeout;
+    function doRound() {
+      for (var i = 0; i < activatedBuildings.length; i++) {
+        activatedBuildings[i].unusedRounds += 1;
+      }
+      clearTimeout(doRoundResetTimeout);
+      document.getElementById('doRound').style.backgroundColor = '#0F0'
+      doRoundResetTimeout = setTimeout(function(){document.getElementById('doRound').style.backgroundColor = '#00F';}, 1000);
+    }
+
+    var randomResetTimeout;
+  	function doRandom() {
+      clearTimeout(randomResetTimeout);
+      if (Math.random() < 0.5) {
+        document.getElementById('random').style.backgroundColor = '#F00';
+      } else {
+        document.getElementById('random').style.backgroundColor = '#0F0';
+      }
+      randomResetTimeout = setTimeout(function(){document.getElementById('random').style.backgroundColor = '#FF0';}, 1000);
     }
   </script>
 </html>
