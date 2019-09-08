@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SMC2.0 assistant</title>
+    <script src="script.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <table style="height: 50%; width: 100%;">
+      <tr style="height: 10%">
+        <th style="height: 10%">mem type</th>
+        <th colspan="2" style="height: 10%">select option</th>
+      </tr>
+      <tr style="height: 45%">
+        <td style="height: 45%">address read from/value</td>
+        <td><select id="VA1" class="high">
+          <option value="value">value</option>
+          <option value="address">address</option>
+        </select></td>
+        <td><select id="V1l" class="high">
+            <option value="0">alu in A</option>
+            <option value="1">alu in b</option>
+            <option value="2">alu option</option>
+            <option value="3">alu out</option>
+            <option value="4">jump</option>
+            <option value="5">user io</option>
+            <option value="6">lognet this computer address</option>
+            <option value="7">lognet send to address</option>
+            <option value="8">lognet data to send and send message</option>
+            <option value="9">lognet got new data?</option>
+            <option value="10">lognet recieved data</option>
+            <option value="11">disk addr</option>
+            <option value="12">disk write data</option>
+            <option value="13">disk read</option>
+            <option value="14">stack write</option>
+            <option value="15">stack read</option>
+            <option value="misc">regular memory</option>
+          </select>
+          <input type="number" name="address write" min="0" max="255" value="0" id="V1n" class="high">
+        </td>
+      </tr>
+      <tr style="height: 45%">
+        <td style="height: 45%">address write to/refrence to address write to</td>
+        <td><select id="VA2" class="high">
+          <option value="address">address</option>
+          <option value="refrence">refrence</option>
+        </select></td>
+        <td><select id="V2l" class="high">
+            <option value="0">alu in A</option>
+            <option value="1">alu in b</option>
+            <option value="2">alu option</option>
+            <option value="3">alu out</option>
+            <option value="4">jump</option>
+            <option value="5">user io</option>
+            <option value="6">lognet this computer address</option>
+            <option value="7">lognet send to address</option>
+            <option value="8">lognet data to send and send message</option>
+            <option value="9">lognet got new data?</option>
+            <option value="10">lognet recieved data</option>
+            <option value="11">disk addr</option>
+            <option value="12">disk write data</option>
+            <option value="13">disk read</option>
+            <option value="14">stack write</option>
+            <option value="15">stack read</option>
+            <option value="misc">regular memory</option>
+          </select>
+          <input type="number" name="address write" min="0" max="63" value="0" id="V2n" class="high">
+        </td>
+      </tr>
+    </table>
+    <table class="binary">
+      <tr>
+        <td id="TVb8">0</td>
+        <td id="TVb7">0</td>
+        <td id="TVb6">0</td>
+        <td id="TVb5">0</td>
+        <td id="TVb4">0</td>
+        <td id="TVb3">0</td>
+        <td id="TVb2">0</td>
+        <td id="TVb1">0</td>
+      </tr>
+      <tr>
+        <td id="TVva">0</td>
+        <td id="TAar">0</td>
+        <td id="TAb6">0</td>
+        <td id="TAb5">0</td>
+        <td id="TAb4">0</td>
+        <td id="TAb3">0</td>
+        <td id="TAb2">0</td>
+        <td id="TAb1">0</td>
+      </tr>
+    </table>
+  </body>
+</html>
