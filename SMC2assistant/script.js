@@ -4,8 +4,8 @@ var DefLink = "https://codemaker4.github.io/SMC2assistant/mobile/index.html?prgm
 
 var qrcode = new QRCode("qrcode", {
     text: "http://jindo.dev.naver.com/collie",
-    width: 200,
-    height: 200,
+    width: 500,
+    height: 500,
     colorDark : "#000000",
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H

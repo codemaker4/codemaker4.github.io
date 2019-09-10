@@ -10,7 +10,7 @@ body {
 
 .symbCode {
   float: left;
-  width: calc(100% - 492px);
+  width: calc(100% - 892px);
   border-width: 0px;
   border-right-width: 10px;
   height: calc(100% - 8px);
