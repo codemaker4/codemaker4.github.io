@@ -1,5 +1,5 @@
 var Startaddress = 16;
-var DefLink = "https://codemaker4.guthub.io/SMC2assistant/mobile/index.html?prgm=";
+var DefLink = "https://codemaker4.github.io/SMC2assistant/mobile/index.html?prgm=";
 
 
 var qrcode = new QRCode("qrcode", {
