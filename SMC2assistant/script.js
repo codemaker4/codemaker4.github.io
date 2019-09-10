@@ -122,7 +122,7 @@ function compile() {
     hexString += hex;
   }
   console.log(DefLink + hexString);
-  qrcode.makeCode(hexString);
+  qrcode.makeCode(DefLink + hexString);
 }
 
 document.getElementById("userCode").value = localStorage.getItem("unCompiledCode");
