@@ -11,7 +11,7 @@
         <td style="height: 50%; width: 50%"><button type="button" id="check" style="height: 100%; width: 100%; backGround-color: #F00; font-size: 10vw;" onclick="check();">controleren</button></td>
       </tr>
       <tr>
-        <td style="height: 50%; width: 50%"><button type="button" id="doRound" style="height: 100%; width: 100%; background-color: #00F; font-size: 10vw;" onclick="doRound();">doe ronde</button></td>
+        <td style="height: 50%; width: 50%"><button type="button" id="startRounds" style="height: 100%; width: 100%; background-color: #00F; font-size: 10vw;" onclick="startRounds();">start rondes</button></td>
         <td style="height: 50%; width: 50%"><button type="button" id="random" style="height: 100%; width: 100%; background-color: #FF0; font-size: 10vw;" onclick="doRandom();">random</button></td>
       </tr>
     </table>
@@ -19,9 +19,10 @@
   <script type="text/javascript">
     var activatedBuildings = [];
     class activatedBuilding {
-      constructor(id) {
+      constructor(id, rpr) {
         this.id = id;
-        this.unusedRounds = 0;
+        this.resourcesPerRound = rpr;
+        this.unusedResources = 0;
       }
     }
     function activateBuilding() {
@@ -37,7 +38,11 @@
         }
       }
       if (!foundBuilding) {
-        activatedBuildings.push(new activatedBuilding(id));
+        var rpr = prompt('hoeveel grondstoffen per ronde?')
+        if (id === null) {
+          return;
+        }
+        activatedBuildings.push(new activatedBuilding(id, parseFloat(rpr)));
       } else {
         alert('Dit gebouw is al geactiveerd.');
       }
@@ -51,8 +56,8 @@
       var foundBuilding = false;
       for (var i = 0; i < activatedBuildings.length; i++) {
         if (activatedBuildings[i].id == id) {
-          alert("Dit gebouw heeft " + activatedBuildings[i].unusedRounds.toString() + " ronde(s) gemist.");
-          activatedBuildings[i].unusedRounds = 0;
+          alert("Dit gebouw heeft " + Math.floor(activatedBuildings[i].unusedResources).toString() + " grondstoffen.");
+          activatedBuildings[i].unusedResources = activatedBuildings[i].unusedResources%1;
           foundBuilding = true;
           break;
         }
@@ -62,14 +67,19 @@
       }
     }
 
-    var doRoundResetTimeout;
-    function doRound() {
-      for (var i = 0; i < activatedBuildings.length; i++) {
-        activatedBuildings[i].unusedRounds += 1;
+    var doRoundInterval
+    function startRounds() {
+      var secs = prompt("geef ronde tijd in secondes");
+      if (parseInt(secs)*1000) {
+        clearInterval(doRoundInterval);
+        doRoundInterval = setInterval(doRound, parseInt(secs)*1000);
       }
-      clearTimeout(doRoundResetTimeout);
-      document.getElementById('doRound').style.backgroundColor = '#0F0'
-      doRoundResetTimeout = setTimeout(function(){document.getElementById('doRound').style.backgroundColor = '#00F';}, 1000);
+    }
+    function doRound() {
+      console.log('round');
+      for (var i = 0; i < activatedBuildings.length; i++) {
+        activatedBuildings[i].unusedResources += activatedBuildings[i].resourcesPerRound;
+      }
     }
 
     var randomResetTimeout;
