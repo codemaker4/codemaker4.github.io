@@ -68,7 +68,7 @@ function give() {// myID.transID.otherID.transType.amount.all+%7
     alert("Je kan niks naar jezelf versturen. Voer het ID van de ander in.")
     return
   }
-  var typeToSend = prompt("Wat wil je versturen? geef een getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:erts\n6:munten\n7:bos\n8:weiland\n9:baksteenfabriek\n10:boederij\n11:mijn\n12:goudmijn");
+  var typeToSend = prompt("Wat wil je versturen? geef een getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:erts\n6:munten\n7:bos\n8:weiland\n9:baksteenfabriek\n10:boederij\n11:mijn");
   if (!typeToSend) {
     alert("geannuleerd");
     return
