@@ -61,6 +61,15 @@ function doRound() {
   redrawInf();
 }
 
+var startRoundCount = prompt("hoeveel rondes starten we?")
+while (isNaN(parseInt(startRoundCount)) || parseInt(startRoundCount) < 0) {
+  startRoundCount = prompt("Dat is geen geldig aantal rondes. Geef een geldig getal");
+}
+
+for (var i = 0; i < startRoundCount; i++) {
+  doRound();
+}
+
 setInterval(doRound, 3*60*1000) // ronde iedere 3 minuten
 
 function give() {// MyID.transID.otherID.transType.amount.all+%7
