@@ -1,7 +1,13 @@
-var inventory = [0,0,0,0,0,0];
+var pWEntered = prompt("Ga naar Thijs")
+while (pWEntered !== "456321") {
+  pWEntered = prompt("Doe niks, ga gewoon naar Thijs.")
+}
+
+var inventory = [0,0,0,0,0];
 var buildings = [0,0,0,0,0];
-const Names = ["hout", "graan", "baksteen", "schaap", "ijzer", "geld"];
+const Names = ["hout", "graan", "baksteen", "schaap", "ijzer"];
 const BuildNames = ["bos", "weiland", "baksteenfabriek", "boederij", "mijn"];
+const AllNames = Names.concat(BuildNames);
 const BuildPrices = [[1,4],[0,1],[3,4],[2,3],[0,2]];
 const PriceAmount = 2;
 var MyID = prompt("Ga naar Thijs voor je ID");
@@ -16,11 +22,6 @@ const TotalThingCount = Names.length+BuildNames.length;
 var defBuilding = prompt("begingebouw?");
 if (defBuilding) {
   buildings[parseInt(defBuilding)] += 1;
-}
-
-inventory[5] = parseInt(prompt("hoeveel geld"));
-while (isNaN(inventory[5]) || inventory[5] <0) {
-  inventory[5] = parseInt(prompt("Dat is geen getal lol, hoeveel geld?"));
 }
 
 function calcScore() {
@@ -55,20 +56,22 @@ function redrawInf() {
 }
 
 function doRound() {
-  for (var i = 0; i < buildings.length-1; i++) {
+  for (var i = 0; i < buildings.length; i++) {
     inventory[i] += buildings[i];
   }
   redrawInf();
 }
+//
+// var startRoundCount = prompt("hoeveel rondes starten we?")
+// while (isNaN(parseInt(startRoundCount)) || parseInt(startRoundCount) < 0) {
+//   startRoundCount = prompt("Dat is geen geldig aantal rondes. Geef een geldig getal");
+// }
+//
+// for (var i = 0; i < startRoundCount; i++) {
+//   doRound();
+// }
 
-var startRoundCount = prompt("hoeveel rondes starten we?")
-while (isNaN(parseInt(startRoundCount)) || parseInt(startRoundCount) < 0) {
-  startRoundCount = prompt("Dat is geen geldig aantal rondes. Geef een geldig getal");
-}
-
-for (var i = 0; i < startRoundCount; i++) {
-  doRound();
-}
+alert("De telefoon is ingesteld. Druk OK wanneer iedereen start.")
 
 setInterval(doRound, 3*60*1000) // ronde iedere 3 minuten
 
@@ -87,7 +90,7 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
     alert("Je kan niks naar jezelf versturen. Voer het ID van de ander in.")
     return
   }
-  var typeToSend = prompt("Wat wil je versturen? geef een getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:ijzer\n6:geld\n7:bos\n8:weiland\n9:baksteenfabriek\n10:boederij\n11:mijn");
+  var typeToSend = prompt("Wat wil je versturen? geef een getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:ijzer\n6:bos\n7:weiland\n8:baksteenfabriek\n9:boederij\n10:mijn");
   if (!typeToSend) {
     alert("geannuleerd");
     return
@@ -104,7 +107,7 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
   if (typeToSend <=Names.length) {
     var amount = prompt("Hoeveel " + Names[typeToSend-1] + " wil je geven? ");
   } else {
-    var amount = prompt("Hoeveel " + BuildNames[typeToSend-7] + " wil je geven?");
+    var amount = prompt("Hoeveel " + BuildNames[typeToSend-Names.length-1] + " wil je geven?");
   }
   if (!amount) {
     alert("geannuleerd");
@@ -141,13 +144,15 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
   var sendCode = MyID + "." + nextSendID.toString() + "." + idToSendTo.toString() + "." + typeToSend.toString() + "." + amount.toString() + "." + confNum;
   alert("Dit is de code:\n" + sendCode + "\nDruk pas op ok wanneer het succesfol is ontvangen. De ander moet op ontvangen drukken en deze code invoeren. Als het niet lukt, ga naar Thijs.");
   nextSendID += 1;
+  addToTransLog("Er is "+ amount.toString() +" "+ AllNames[typeToSend] +"verzonden. De code was: '"+ sendCode +"'.");
   redrawInf();
 }
 
 function buyBuilding() {
   var priceText = "Welk gebouw wil je kopen? Geeft het getal voor het gebouw.\n";
   for (var i = 0; i < BuildNames.length; i++) {
-    priceText += (i+1).toString() +": "+ BuildNames[i] +", kost: "+ PriceAmount.toString() +" "+ Names[BuildPrices[i][0]] +", "+ PriceAmount.toString() +" "+ Names[BuildPrices[i][1]] +"\n";
+    var nowBuildPrice = (PriceAmount + buildings[i]).toString()
+    priceText += (i+1).toString() +": "+ BuildNames[i] +", kost: "+ nowBuildPrice +" "+ Names[BuildPrices[i][0]] +", "+ nowBuildPrice +" "+ Names[BuildPrices[i][1]] +"\n";
   }
   var buildingToBuy = prompt(priceText);
   if (!buildingToBuy) {
@@ -165,19 +170,21 @@ function buyBuilding() {
   }
   buildingToBuy -= 1;
   if (parseInt(MyID) >= SpelleiderHoeveelheid) {
-    if (inventory[BuildPrices[buildingToBuy][0]] < PriceAmount) {
+    var price = PriceAmount+buildings[buildingToBuy]
+    if (inventory[BuildPrices[buildingToBuy][0]] < price) {
       alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][0]] +" om een "+ BuildNames[buildingToBuy] +" te kopen. Geannuleerd");
       return
     }
-    if (inventory[BuildPrices[buildingToBuy][1]] < PriceAmount) {
+    if (inventory[BuildPrices[buildingToBuy][1]] < price) {
       alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][1]] +" om een "+ BuildNames[buildingToBuy] +" te kopen. Geannuleerd");
       return
     }
-    inventory[BuildPrices[buildingToBuy][0]] -= PriceAmount;
-    inventory[BuildPrices[buildingToBuy][1]] -= PriceAmount;
+    inventory[BuildPrices[buildingToBuy][0]] -= price;
+    inventory[BuildPrices[buildingToBuy][1]] -= price;
   }
   buildings[buildingToBuy] += 1;
   alert("Er is een "+ BuildNames[buildingToBuy] +" gekocht.");
+  addToTransLog("Er is een "+ BuildNames[buildingToBuy] +" gekocht.");
   redrawInf();
 }
 
@@ -232,11 +239,13 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
   // de code is geldig.
   if (recievedList[3] < Names.length) { // als grondstof
     inventory[recievedList[3]] += recievedList[4];
-    alert("Er is " + recievedList[4].toString() + " keer " + Names[recievedList[3]] + " ontvangen.");
+    // alert("Er is " + recievedList[4].toString() + " keer " + Names[recievedList[3]] + " ontvangen.");
   } else { // als gebouw
-    buildings[recievedList[3]-6] += recievedList[4];
-    alert("Er is " + recievedList[4].toString() + " keer " + BuildNames[recievedList[3]-Names.length] + " ontvangen.");
+    buildings[recievedList[3]-Names.length] += recievedList[4];
+    // alert("Er is " + recievedList[4].toString() + " keer " + BuildNames[recievedList[3]-Names.length] + " ontvangen.");
   }
+  alert("Er is " + recievedList[4].toString() + " keer " + AllNames[recievedList[3]] + " ontvangen.");
+  addToTransLog("Er is " + recievedList[4].toString() + " keer " + AllNames[recievedList[3]] + " ontvangen.")
   recievedIDs.push(fTransID);
   redrawInf();
 }
@@ -259,6 +268,8 @@ function changeStyle() {
     document.getElementById("mainDiv").style["color"] = "#000";
     document.getElementById("changeStyle").style["background-color"] = "#CCC";
     document.getElementById("changeStyle").style["color"] = "#000";
+    document.getElementById("transactions").style["background-color"] = "#FF2";
+    document.getElementById("transactions").style["color"] = "#000";
     setTimeout(function() {
       document.getElementById("changeStyle").innerHTML = "Donker thema";
     }, 300);
@@ -276,8 +287,24 @@ function changeStyle() {
     document.getElementById("mainDiv").style["color"] = "#FFF";
     document.getElementById("changeStyle").style["background-color"] = "#222";
     document.getElementById("changeStyle").style["color"] = "#FFF";
+    document.getElementById("transactions").style["background-color"] = "#880";
+    document.getElementById("transactions").style["color"] = "#FFF";
     setTimeout(function() {
       document.getElementById("changeStyle").innerHTML = "Licht thema";
     }, 300);
   }
+}
+
+var transLog = ["start van het spel."]
+
+function addToTransLog(trans) {
+  transLog.push(trans);
+}
+
+function giveTransLog() {
+  str = "Hier is een log van de "+ (transLog.length-1).toString() +" transacties.\n";
+  for (var i = transLog.length-1; i >= 0; i--) {
+    str += i.toString() +": "+ transLog[i] + "\n";
+  }
+  alert(str);
 }
