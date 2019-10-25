@@ -1,6 +1,10 @@
-var Startaddress = 16;
 var DefLink = "https://codemaker4.github.io/SMC2assistant/mobile/index.html?prgm=";
 
+var Startaddress = parseInt(document.getElementById("lineStart").value);
+function lineStartChange() {
+  Startaddress = parseInt(document.getElementById("lineStart").value);
+  compile(true);
+};
 
 var qrcode = new QRCode("qrcode", {
     text: "http://jindo.dev.naver.com/collie",
@@ -14,9 +18,9 @@ var qrcode = new QRCode("qrcode", {
 
 var oldUserText = ""
 
-function compile() {
+function compile(force) {
   var userTextStr = document.getElementById("userCode").value;
-  if (oldUserText == userTextStr ) {
+  if (oldUserText == userTextStr && !force) {
     return
   }
   oldUserText = userTextStr;
@@ -123,9 +127,15 @@ function compile() {
   }
   console.log(DefLink + hexString);
   qrcode.makeCode(DefLink + hexString);
+  document.getElementById("qrcode").onclick = function() {window.open(DefLink + hexString);};
+  console.log(document.getElementById("qrcode").onclick);
 }
 
 document.getElementById("userCode").value = localStorage.getItem("unCompiledCode");
 
-
 setInterval(compile, 100);
+
+function loadProgram(prgmName) {
+  document.getElementById("userCode").value = programLib[prgmName];
+  compile(true);
+}
