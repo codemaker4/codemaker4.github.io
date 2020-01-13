@@ -18,6 +18,7 @@ while (isNaN(parseInt(MyID)) || MyID <0) { // id moet een gat zijn, en 0 of hoge
 }
 var nextSendID = 0; // dit is nodig om een unieke code te maken voor iedere verzending. Telt op met 1 voor iedere geef transactie.
 var recievedIDs = []; // dit zijn alle ontavngen transacties. ze zijn als ["<geverID>;<geverSnedID>", "<geverID>;<geverSnedID>", .....]
+var openedChests = []; // dit zijn alle kistID's die zijn geopend.
 const SpelleiderHoeveelheid = 5; // dit is het aantal spelleiders. Zie de code voor MyID initialisatie
 const TotalThingCount = Names.length+BuildNames.length; // dit is een getal voor het totaal aantal type dingen (grondstypen + gebouwtypen)
 const ConfNumDepth = 6; // seed for random num generator.
@@ -40,15 +41,15 @@ function getConfNum(num, depth) {
 }
 
 // confNum randomness test
-// var stats = [0,0,0,0,0,0,0,0,0];
-// for (var i = 0; i < 100000; i++) {
-//   var num = getConfNum(i, ConfNumDepth);
-//   if (i < 50) {
-//     console.log(i, num);
-//   }
-//   stats[num] += 1;
-// }
-// console.log(stats);
+var stats = [0,0,0,0,0,0,0,0,0];
+for (var i = 0; i < 100000; i++) {
+  var num = getConfNum(i, ConfNumDepth);
+  if (i < 50) {
+    console.log(i, num);
+  }
+  stats[num] += 1;
+}
+console.log(stats);
 
 // returnt de score van de speler.
 function calcScore() {
@@ -280,6 +281,48 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
   redrawInf();
 }
 
+// functie voor het looten van een lootchest.
+function lootChest() {
+  var chestCode = prompt("Welke code staat er in de kist?", "1,2,3,4"); // chestID, lootType, amount, confNum
+  if (!chestCode) {
+    alert("geannuleerd");
+    return
+  }
+  chestCode = chestCode.split(".");
+  if (chestCode.length != 4) {
+    alert("Dat is geen geldige kistcode. Een kistcode heeft 4 getallen, zoals 1.2.3.4");
+    return
+  }
+  var confNum = 0;
+  for (var i = 0; i < chestCode.length-1; i++) {
+    chestCode[i] = parseInt(chestCode[i])
+    if (isNaN(chestCode[i])) {
+      alert("Een of meer van de code delen is geen geldig getal. Let er op dat er geen spatie na de punt is toegevoegd en probeer het opnieuw.")
+      return;
+    }
+    confNum += chestCode[i]
+  }
+  if (chestCode[3] != getConfNum(confNum, ConfNumDepth)) {
+    alert("Een of meer van de getallen is verkeerd. Probeer het opnieuw.")
+    return;
+  }
+  if (openedChests.includes(chestCode[0])) {
+    alert("Je probeert de rest er uit te halen, maar je hand gaat recht door de inhoud van de kist heen, alsof het een hologram is. Iemand anders zou het er wel uit kunnen halen, dus probeer de kist met iemand te ruilen.");
+    return
+  }
+  if (chestCode[1] < Names.length) {
+    inventory[chestCode[1]] += chestCode[2];
+    alert("De kist had " + chestCode[2].toString() + " " + AllNames[chestCode[1]] + ". Je haalt het er uit, maar er lijkt nog meer in te zitten...");
+  } else if (chestCode[1] < AllNames.length) {
+    buildings[chestCode[1]-Names.length] += chestCode[2];
+  } else {
+    alert("De kist lijkt een niet bestaand item te hebben. Probeer het opnieuw.")
+    return;
+  }
+  openedChests.push(chestCode[0]);
+  redrawInf();
+}
+
 redrawInf();
 
 var nowStyle = 1
@@ -294,6 +337,8 @@ function changeStyle() {
     document.getElementById("buyBuilding").style["color"] = "#000";
     document.getElementById("recieve").style["background-color"] = "#2F2";
     document.getElementById("recieve").style["color"] = "#000";
+    document.getElementById("lootChest").style["background-color"] = "#CC2";
+    document.getElementById("lootChest").style["color"] = "#000";
     document.getElementById("mainDiv").style["background-color"] = "#FFF";
     document.getElementById("mainDiv").style["color"] = "#000";
     document.getElementById("changeStyle").style["background-color"] = "#CCC";
@@ -313,6 +358,8 @@ function changeStyle() {
     document.getElementById("buyBuilding").style["color"] = "#FFF";
     document.getElementById("recieve").style["background-color"] = "#080";
     document.getElementById("recieve").style["color"] = "#FFF";
+    document.getElementById("lootChest").style["background-color"] = "#660";
+    document.getElementById("lootChest").style["color"] = "#FFF";
     document.getElementById("mainDiv").style["background-color"] = "#000";
     document.getElementById("mainDiv").style["color"] = "#FFF";
     document.getElementById("changeStyle").style["background-color"] = "#222";
