@@ -320,6 +320,7 @@ function lootChest() {
     return;
   }
   openedChests.push(chestCode[0]);
+  addToTransLog("Er is " + chestCode[2].toString() + " keer " + AllNames[chestCode[1]] + " uit kist " + chestCode[0].toString() + " gehaald.")
   redrawInf();
 }
 
