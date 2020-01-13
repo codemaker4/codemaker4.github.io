@@ -22,6 +22,7 @@ var openedChests = []; // dit zijn alle kistID's die zijn geopend.
 const SpelleiderHoeveelheid = 5; // dit is het aantal spelleiders. Zie de code voor MyID initialisatie
 const TotalThingCount = Names.length+BuildNames.length; // dit is een getal voor het totaal aantal type dingen (grondstypen + gebouwtypen)
 const ConfNumDepth = 6; // seed for random num generator.
+const Version = "1.3.4";
 
 // startGebouw initialisatie
 var defBuilding = prompt("begingebouw?" + BuildNames);
@@ -41,15 +42,15 @@ function getConfNum(num, depth) {
 }
 
 // confNum randomness test
-var stats = [0,0,0,0,0,0,0,0,0];
-for (var i = 0; i < 100000; i++) {
-  var num = getConfNum(i, ConfNumDepth);
-  if (i < 50) {
-    console.log(i, num);
-  }
-  stats[num] += 1;
-}
-console.log(stats);
+// var stats = [0,0,0,0,0,0,0,0,0];
+// for (var i = 0; i < 100000; i++) {
+//   var num = getConfNum(i, ConfNumDepth);
+//   if (i < 50) {
+//     console.log(i, num);
+//   }
+//   stats[num] += 1;
+// }
+// console.log(stats);
 
 // returnt de score van de speler.
 function calcScore() {
@@ -80,7 +81,8 @@ function redrawInf() {
   for (var i = 0; i < buildings.length; i++) {
     string += "<li>" + BuildNames[i] + ": " + buildings[i].toString() + "</li>"; // geef de gebouwen aan
   }
-  string += "</ul><h3>instellingen:</h3>" // titel voor de instellingen knoppen onderaan het scherm
+  string += "</ul><h3 style='margin-bottom:3vw;'>instellingen:</h3>" // titel voor de instellingen knoppen onderaan het scherm
+  string += "<p style='font-size:3vw;margin:0;'><b>Versie: " + Version + "</b></p>"
   document.getElementById('mainDiv').innerHTML = string; // update de HTML
 }
 
