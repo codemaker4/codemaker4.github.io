@@ -283,7 +283,7 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
 
 // functie voor het looten van een lootchest.
 function lootChest() {
-  var chestCode = prompt("Welke code staat er in de kist?", "1,2,3,4"); // chestID, lootType, amount, confNum
+  var chestCode = prompt("Welke code staat er in de kist?", "1.2.3.4"); // chestID, lootType, amount, confNum
   if (!chestCode) {
     alert("geannuleerd");
     return
