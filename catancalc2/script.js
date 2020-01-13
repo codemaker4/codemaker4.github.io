@@ -1,60 +1,89 @@
+// soort wachtwoord
 var pWEntered = prompt("Ga naar Thijs")
 while (pWEntered !== "456321") {
   pWEntered = prompt("Doe niks, ga gewoon naar Thijs.")
 }
 
-var inventory = [0,0,0,0,0];
-var buildings = [0,0,0,0,0];
-const Names = ["hout", "graan", "baksteen", "schaap", "ijzer"];
-const BuildNames = ["bos", "weiland", "baksteenfabriek", "boederij", "mijn"];
-const AllNames = Names.concat(BuildNames);
-const BuildPrices = [[1,4],[0,1],[3,4],[2,3],[0,2]];
-const PriceAmount = 2;
-var MyID = prompt("Ga naar Thijs voor je ID");
-while (isNaN(parseInt(MyID)) || MyID <0) {
-  MyID = prompt("Dat is geen geldig ID. Ga naar Thijs voor je ID.");
+// initialisatie
+var inventory = [0,0,0,0,0]; // hoeveelheid grondstoffen per grondstof.
+var buildings = [0,0,0,0,0]; // heoveelheid gebouwen
+const Names = ["hout", "graan", "baksteen", "schaap", "ijzer"]; // namen van grondstoffen
+const BuildNames = ["bos", "weiland", "baksteenfabriek", "boederij", "mijn"]; // namen van gebouwen
+const AllNames = Names.concat(BuildNames); // namen van alle dingen bij elkaar.
+const BuildPrices = [[4,1],[1,0],[3,4],[2,3],[0,2]]; // type grondstoffen nodig per gebouw
+const PriceAmount = 2; // hoeveelheid grondstoffen nodig per grondstof voor een gebouw op het begin
+var MyID = prompt("Ga naar Thijs voor je ID"); // id initialisatie
+while (isNaN(parseInt(MyID)) || MyID <0) { // id moet een gat zijn, en 0 of hoger. Als een id tussen 0 (inclusief) en <SpelleiderHoeveelheid> (explusief) zit, is het een spelleider
+  MyID = prompt("Dat is geen geldig ID. Ga naar Thijs voor je ID."); // als het ID verkeerd is ingevoerd, wordt er opnieuw gevraagd
 }
-var nextSendID = 0;
-var recievedIDs = [];
-const SpelleiderHoeveelheid = 5;
-const TotalThingCount = Names.length+BuildNames.length;
+var nextSendID = 0; // dit is nodig om een unieke code te maken voor iedere verzending. Telt op met 1 voor iedere geef transactie.
+var recievedIDs = []; // dit zijn alle ontavngen transacties. ze zijn als ["<geverID>;<geverSnedID>", "<geverID>;<geverSnedID>", .....]
+const SpelleiderHoeveelheid = 5; // dit is het aantal spelleiders. Zie de code voor MyID initialisatie
+const TotalThingCount = Names.length+BuildNames.length; // dit is een getal voor het totaal aantal type dingen (grondstypen + gebouwtypen)
+const ConfNumDepth = 6; // seed for random num generator.
 
-var defBuilding = prompt("begingebouw?");
-if (defBuilding) {
+// startGebouw initialisatie
+var defBuilding = prompt("begingebouw?" + BuildNames);
+while (defBuilding && (isNaN(parseInt(defBuilding)) || parseInt(defBuilding) < 0 || parseInt(defBuilding) >= BuildNames.length)) {
+  defBuilding = prompt("dat is geen begingebouw. begingebouw?" + BuildNames);
+}
+if (defBuilding) { // false als er niks is ingevoerd of er op annuleren is gedrukt, true als er wat staat en het uit de voorige loop is gekomen.
   buildings[parseInt(defBuilding)] += 1;
 }
 
+// calculates the confnum for a given sum
+function getConfNum(num, depth) {
+  if (depth <= 0) {
+    return (num*num)%53;
+  }
+  return ((num*getConfNum(num+depth+7224, depth-1)*533)+(depth+(num*123)+924))%9;
+}
+
+// confNum randomness test
+// var stats = [0,0,0,0,0,0,0,0,0];
+// for (var i = 0; i < 100000; i++) {
+//   var num = getConfNum(i, ConfNumDepth);
+//   if (i < 50) {
+//     console.log(i, num);
+//   }
+//   stats[num] += 1;
+// }
+// console.log(stats);
+
+// returnt de score van de speler.
 function calcScore() {
   var score = 0;
   for (var i = 0; i < inventory.length-1; i++) {
-    score += inventory[i]*25;
+    score += inventory[i]*25; // voor iedere grondstof 25 punten
   }
   for (var i = 0; i < buildings.length; i++) {
-    score += buildings[i]*200;
+    score += buildings[i]*200; // voor ieder gebouw 200 punten
   }
   return score;
 }
 
+// ververst de tekst met info over de splere, de score, de grondstoffen en de geouwen. AANgeroepen aan het begin van het spel, wanneer er is gehandeld en na een ronde.
 function redrawInf() {
-  var string = "Jouw ID: "
-  if (parseInt(MyID) < SpelleiderHoeveelheid) {
+  var string = "Jouw ID: " // begint met het verversen van de ID
+  if (parseInt(MyID) < SpelleiderHoeveelheid) { // als spelleider
     string += MyID + ", spelleider<br>"
-  } else {
+  } else { // als gewone speler
     string += MyID + "<br>";
   }
-  string += "jouw score: " + calcScore().toString() + '<br>';
-  string += "<h3>jouw grondstoffen:</h3><ul>";
+  string += "jouw score: " + calcScore().toString() + '<br>'; // score berekening en laten zien
+  string += "<h3>jouw grondstoffen:</h3><ul>"; // begin grondstoffen lijst
   for (var i = 0; i < inventory.length; i++) {
-    string += "<li>" + Names[i] + ": " + inventory[i].toString() + "</li>";
+    string += "<li>" + Names[i] + ": " + inventory[i].toString() + "</li>"; // geef de grondstoffen aan
   }
-  string += "</ul><h3>jouw gebouwen:</h3><ul>";
+  string += "</ul><h3>jouw gebouwen:</h3><ul>"; // begin gebouwen lijst
   for (var i = 0; i < buildings.length; i++) {
-    string += "<li>" + BuildNames[i] + ": " + buildings[i].toString() + "</li>";
+    string += "<li>" + BuildNames[i] + ": " + buildings[i].toString() + "</li>"; // geef de gebouwen aan
   }
-  string += "</ul><h3>instellingen:</h3>"
-  document.getElementById('mainDiv').innerHTML = string;
+  string += "</ul><h3>instellingen:</h3>" // titel voor de instellingen knoppen onderaan het scherm
+  document.getElementById('mainDiv').innerHTML = string; // update de HTML
 }
 
+// zorgt ervoor dat alle gebouwen worden geupdated
 function doRound() {
   for (var i = 0; i < buildings.length; i++) {
     inventory[i] += buildings[i];
@@ -73,7 +102,7 @@ function doRound() {
 
 alert("De telefoon is ingesteld. Druk OK wanneer iedereen start.")
 
-setInterval(doRound, 3*60*1000) // ronde iedere 3 minuten
+setInterval(doRound, 2*60*1000) // ronde iedere 2 minuten
 
 function give() {// MyID.transID.otherID.transType.amount.all+%7
   var idToSendTo = prompt("Geeft de ID van het persoon waarnaar je dit stuurt. De ID staat op het scherm van de ontvanger, onder de geef knop");
@@ -140,7 +169,8 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
   } else {
     alert("spelleiderToegang");
   }
-  var confNum = ((parseInt(MyID)+nextSendID+idToSendTo+typeToSend+amount)%7).toString();
+  // var confNum = ((parseInt(MyID)+nextSendID+idToSendTo+typeToSend+amount)%7).toString();
+  var confNum = getConfNum(parseInt(MyID)+nextSendID+idToSendTo+typeToSend+amount, ConfNumDepth).toString();
   var sendCode = MyID + "." + nextSendID.toString() + "." + idToSendTo.toString() + "." + typeToSend.toString() + "." + amount.toString() + "." + confNum;
   alert("Dit is de code:\n" + sendCode + "\nDruk pas op ok wanneer het succesfol is ontvangen. De ander moet op ontvangen drukken en deze code invoeren. Als het niet lukt, ga naar Thijs.");
   nextSendID += 1;
@@ -227,7 +257,7 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
     alert("Er wordt iets verkocht dat niet bestaat. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
     return;
   }
-  confNum = confNum%7;
+  confNum = getConfNum(confNum, ConfNumDepth);
   if (confNum != recievedList[5]) {
     console.log(confNum, recievedList[5]);
     alert("De code is ongeldig. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
