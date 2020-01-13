@@ -307,12 +307,12 @@ function lootChest() {
     return;
   }
   if (openedChests.includes(chestCode[0])) {
-    alert("Je probeert de rest er uit te halen, maar je hand gaat recht door de inhoud van de kist heen, alsof het een hologram is. Iemand anders zou het er wel uit kunnen halen, dus probeer de kist met iemand te ruilen.");
+    alert("Je hebt deze kist al geopend. Iemand anders kan hem wel nog openen.");
     return
   }
   if (chestCode[1] < Names.length) {
     inventory[chestCode[1]] += chestCode[2];
-    alert("De kist had " + chestCode[2].toString() + " " + AllNames[chestCode[1]] + ". Je haalt het er uit, maar er lijkt nog meer in te zitten...");
+    alert("De kist had " + chestCode[2].toString() + " " + AllNames[chestCode[1]] + ".");
   } else if (chestCode[1] < AllNames.length) {
     buildings[chestCode[1]-Names.length] += chestCode[2];
   } else {
