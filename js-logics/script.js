@@ -1,6 +1,6 @@
 var xScreenSize = innerWidth; // canvas size
 var yScreenSize = innerHeight;
-var version = 'Beta 0.5.1';
+var version = 'Beta 0.5.2';
 var gateSize = 100;
 var connectionsVisible = true;
 var connectionOpacity = 127;
@@ -56,7 +56,7 @@ class gate {
     this.trueInputs = 0;
     this.selected = false;
     this.rotation = 0;
-    this.gotPressed = false
+    this.userIOIsOn = false;
   }
   render() { // graphics, no calculations.
     push();
@@ -169,27 +169,10 @@ function gateLamp(trueConnections, inputs, gate) {
   return(gateAND(trueConnections, inputs))
 }
 function gateButton(trueConnections, inputs, gate) {
-  if (gate.gotPressed) {
-    gate.gotPressed = false;
-    console.log(gate.gotPressed);
-    return true;
-  }
-  return false;
+  return gate.userIOIsOn;
 }
 function gateSwitch(trueConnections, inputs, gate) {
-  var isPressed = gate.gotPressed
-  if (gate.wasPressed === undefined) {
-    gate.wasPressed = isPressed;
-  } else if (isPressed) {
-    if (gate.wasPressed === false) {
-      gate.value = !gate.value;
-      gate.wasPressed = true;
-    }
-  } else {
-    gate.wasPressed = false;
-  }
-  gate.gotPressed = false;
-  return(gate.value);
+  return gate.userIOIsOn;
 }
 typesF = [gateAND, gateOR, gateNAND, gateNOR, gateXOR, gateNXOR, gateLamp, gateButton, gateSwitch];
 
@@ -222,6 +205,8 @@ function renderAll() {
 // dragging
 var drags = 0;
 var dragging = false;
+var dragStart = [0,0];
+var dragStartView = [0,0];
 var selectDrags = 0;
 var selecting = false;
 var selectingStart = [0,0];
@@ -242,6 +227,16 @@ function mousePressed() {
     } else {
       dragging = true;
       drags = 0;
+      dragStart = [mouseX, mouseY];
+      dragStartView = [viewX, viewY];
+      var gatePressed = isPressingGate();
+      if (gatePressed[0] === true) {
+        if (gates[gatePressed[1]].gateType === 7) { // button
+          gates[gatePressed[1]].userIOIsOn = true;
+        } else if (gates[gatePressed[1]].gateType === 8) { // witch
+          gates[gatePressed[1]].userIOIsOn = !gates[gatePressed[1]].userIOIsOn;
+        }
+      }
     }
   } else if (mouseButton === CENTER) {
     var isPressingGateRes = isPressingGate();
@@ -252,8 +247,8 @@ function mousePressed() {
 }
 function mouseDragged() {
   if (dragging) {
-    viewX += ((pmouseX-mouseX)*-1)/viewZoom;
-    viewY += ((pmouseY-mouseY)*-1)/viewZoom;
+    viewX = dragStartView[0]+((mouseX-dragStart[0])/viewZoom);
+    viewY = dragStartView[1]+((mouseY-dragStart[1])/viewZoom);
     drags += 1;
   } else if (selecting) {
     selectDrags += 1;
@@ -268,6 +263,11 @@ function mouseReleased() {
   }
   dragging = false;
   selecting = false;
+  for (var i = 0; i < gates.length; i++) {
+    if (gates[i].gateType === 7) { // button
+      gates[i].userIOIsOn = false;
+    }
+  }
 }
 function mouseWheel(event) {
   if (event.delta < 0) {
