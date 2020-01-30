@@ -1,8 +1,20 @@
-// soort wachtwoord
-// var pWEntered = prompt("Ga naar Thijs")
-// while (pWEntered !== "456321") {
-//   pWEntered = prompt("Doe niks, ga gewoon naar Thijs.")
-// }
+//soort wachtwoord
+var pWEntered = prompt("Ga naar Thijs")
+if (pWEntered === "ibt") {
+  while (true) { //  als goed convert codes om andere gebruikers te unlocken
+    var num = parseInt(prompt("geef de code"));
+    if (num === 1000) {
+      alert("gestopt");
+      break;
+    }
+    alert((((num*1353463)%2342)*174598)%1000);
+  }
+} else { // als neit goed heb je een code nodig
+  var startupConfNum = Math.floor(Math.random()*1000)
+  while (prompt("geef de code voor " + startupConfNum.toString() + ":") !== ((((startupConfNum*1353463)%2342)*174598)%1000).toString()) {
+    alert("Code incorrect, probeer opnieuw.");
+  }
+}
 
 // initialisatie
 var inventory = [0,0,0,0,0]; // hoeveelheid grondstoffen per grondstof.
@@ -22,7 +34,7 @@ var openedChests = []; // dit zijn alle kistID's die zijn geopend.
 const SpelleiderHoeveelheid = 5; // dit is het aantal spelleiders. Zie de code voor MyID initialisatie
 const TotalThingCount = Names.length+BuildNames.length; // dit is een getal voor het totaal aantal type dingen (grondstypen + gebouwtypen)
 const ConfNumDepth = 6; // seed for random num generator.
-const Version = "1.3.5";
+const Version = "1.4";
 const RoundLength = 2;
 
 // startGebouw initialisatie
