@@ -1,8 +1,8 @@
 // soort wachtwoord
-var pWEntered = prompt("Ga naar Thijs")
-while (pWEntered !== "456321") {
-  pWEntered = prompt("Doe niks, ga gewoon naar Thijs.")
-}
+// var pWEntered = prompt("Ga naar Thijs")
+// while (pWEntered !== "456321") {
+//   pWEntered = prompt("Doe niks, ga gewoon naar Thijs.")
+// }
 
 // initialisatie
 var inventory = [0,0,0,0,0]; // hoeveelheid grondstoffen per grondstof.
@@ -22,7 +22,8 @@ var openedChests = []; // dit zijn alle kistID's die zijn geopend.
 const SpelleiderHoeveelheid = 5; // dit is het aantal spelleiders. Zie de code voor MyID initialisatie
 const TotalThingCount = Names.length+BuildNames.length; // dit is een getal voor het totaal aantal type dingen (grondstypen + gebouwtypen)
 const ConfNumDepth = 6; // seed for random num generator.
-const Version = "1.3.4";
+const Version = "1.3.5";
+const RoundLength = 2;
 
 // startGebouw initialisatie
 var defBuilding = prompt("begingebouw?" + BuildNames);
@@ -82,7 +83,7 @@ function redrawInf() {
     string += "<li>" + BuildNames[i] + ": " + buildings[i].toString() + "</li>"; // geef de gebouwen aan
   }
   string += "</ul><h3 style='margin-bottom:3vw;'>instellingen:</h3>" // titel voor de instellingen knoppen onderaan het scherm
-  string += "<p style='font-size:3vw;margin:0;'><b>Versie: " + Version + "</b></p>"
+  string += "<p style='font-size:3vw;margin:0;'><b>versie: " + Version + "</b></p>"
   document.getElementById('mainDiv').innerHTML = string; // update de HTML
 }
 
@@ -103,37 +104,37 @@ function doRound() {
 //   doRound();
 // }
 
-alert("De telefoon is ingesteld. Druk OK wanneer iedereen start.")
+alert("Je telefoon is ingesteld. Druk pas op OK wanneer iedereen start.")
 
-setInterval(doRound, 2*60*1000) // ronde iedere 2 minuten
+setInterval(doRound, RoundLength*60*1000) // ronde
 
 function give() {// MyID.transID.otherID.transType.amount.all+%7
-  var idToSendTo = prompt("Geeft de ID van het persoon waarnaar je dit stuurt. De ID staat op het scherm van de ontvanger, onder de geef knop");
+  var idToSendTo = prompt("Geef de ID van het persoon waarnaar je iets wilt sturen. De ID staat op het scherm van de ontvanger, vlak onder de ontvang knop.");
   if (!idToSendTo) {
     alert("geannuleerd");
     return
   }
   idToSendTo = parseInt(idToSendTo);
   if (isNaN(idToSendTo) || idToSendTo < 0) {
-    alert("Dat is geen getal. Het ID moet een getal zijn.")
+    alert("Dat is geen geldig getal. Een ID moet een geldig getal zijn.")
     return
   }
   if (parseInt(MyID) == idToSendTo) {
-    alert("Je kan niks naar jezelf versturen. Voer het ID van de ander in.")
+    alert("Je kan niet iets naar jezelf versturen. Voer de ID in van de speler die jij iets wilt geven.")
     return
   }
-  var typeToSend = prompt("Wat wil je versturen? geef een getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:ijzer\n6:bos\n7:weiland\n8:baksteenfabriek\n9:boederij\n10:mijn");
+  var typeToSend = prompt("Wat wil je versturen? geef het getal:\n1:hout\n2:graan\n3:baksteen\n4:schaap\n5:ijzer\n6:bos\n7:weiland\n8:baksteenfabriek\n9:boederij\n10:mijn");
   if (!typeToSend) {
     alert("geannuleerd");
     return
   }
   typeToSend = parseInt(typeToSend)
   if (isNaN(typeToSend)) {
-    alert("Dat is geen getal. Voer een getal in. Geannuleerd.")
+    alert("Dat is geen getal. Voer een getal in. Er is niks verzonden.")
     return
   }
   if (typeToSend <= 0 || typeToSend > TotalThingCount) {
-    alert("Dat getal is niet een van de opties. Geannuleerd.")
+    alert("Dat getal is niet een van de opties. Er is niks verzonden.")
     return;
   }
   if (typeToSend <=Names.length) {
@@ -147,7 +148,7 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
   }
   amount = parseInt(amount);
   if (isNaN(amount)) {
-    alert("Dat is geen getal. Geannuleerd.");
+    alert("Dat is geen getal. Er is niks verzonden.");
     return
   }
   if (amount <= 0) {
@@ -175,49 +176,49 @@ function give() {// MyID.transID.otherID.transType.amount.all+%7
   // var confNum = ((parseInt(MyID)+nextSendID+idToSendTo+typeToSend+amount)%7).toString();
   var confNum = getConfNum(parseInt(MyID)+nextSendID+idToSendTo+typeToSend+amount, ConfNumDepth).toString();
   var sendCode = MyID + "." + nextSendID.toString() + "." + idToSendTo.toString() + "." + typeToSend.toString() + "." + amount.toString() + "." + confNum;
-  alert("Dit is de code:\n" + sendCode + "\nDruk pas op ok wanneer het succesfol is ontvangen. De ander moet op ontvangen drukken en deze code invoeren. Als het niet lukt, ga naar Thijs.");
+  alert("Dit is de code:\n" + sendCode + "\nDruk pas op ok wanneer het succesfol is ontvangen. De ander moet op ontvangen drukken en deze code invoeren.");
   nextSendID += 1;
   addToTransLog("Er is "+ amount.toString() +" "+ AllNames[typeToSend] +"verzonden. De code was: '"+ sendCode +"'.");
   redrawInf();
 }
 
 function buyBuilding() {
-  var priceText = "Welk gebouw wil je kopen? Geeft het getal voor het gebouw.\n";
+  var priceText = "Welk gebouw wil je kopen? Geeft het getal.\n";
   for (var i = 0; i < BuildNames.length; i++) {
     var nowBuildPrice = (PriceAmount + buildings[i]).toString()
     priceText += (i+1).toString() +": "+ BuildNames[i] +", kost: "+ nowBuildPrice +" "+ Names[BuildPrices[i][0]] +", "+ nowBuildPrice +" "+ Names[BuildPrices[i][1]] +"\n";
   }
   var buildingToBuy = prompt(priceText);
   if (!buildingToBuy) {
-    alert("Geannuleerd.");
+    alert("geannuleerd");
     return
   }
   buildingToBuy = parseInt(buildingToBuy)
   if (isNaN(buildingToBuy)) {
-    alert("Dat is geen getal. Geef een getal om aan te geven welk gebouw je wilt kopen. Geannuleerd");
+    alert("Dat is geen getal. Geef een getal om aan te geven welk gebouw je wilt kopen.");
     return
   }
   if (buildingToBuy <= 0 || buildingToBuy > BuildNames.length) {
-    alert("Dat was niet een van de opties. Geef een getal om aan te geven welk gebouw je wilt kopen. Geannuleerd")
+    alert("Dat was niet een van de opties. Geef een getal om aan te geven welk gebouw je wilt kopen.")
     return
   }
   buildingToBuy -= 1;
   if (parseInt(MyID) >= SpelleiderHoeveelheid) {
     var price = PriceAmount+buildings[buildingToBuy]
     if (inventory[BuildPrices[buildingToBuy][0]] < price) {
-      alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][0]] +" om een "+ BuildNames[buildingToBuy] +" te kopen. Geannuleerd");
+      alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][0]] +" om een "+ BuildNames[buildingToBuy] +" te kopen.");
       return
     }
     if (inventory[BuildPrices[buildingToBuy][1]] < price) {
-      alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][1]] +" om een "+ BuildNames[buildingToBuy] +" te kopen. Geannuleerd");
+      alert("Je hebt niet genoeg "+ Names[BuildPrices[buildingToBuy][1]] +" om een "+ BuildNames[buildingToBuy] +" te kopen.");
       return
     }
     inventory[BuildPrices[buildingToBuy][0]] -= price;
     inventory[BuildPrices[buildingToBuy][1]] -= price;
   }
   buildings[buildingToBuy] += 1;
-  alert("Er is een "+ BuildNames[buildingToBuy] +" gekocht.");
-  addToTransLog("Er is een "+ BuildNames[buildingToBuy] +" gekocht.");
+  alert("Er is succesfol een "+ BuildNames[buildingToBuy] +" gekocht.");
+  addToTransLog("Er is succesfol een "+ BuildNames[buildingToBuy] +" gekocht.");
   redrawInf();
 }
 
@@ -229,14 +230,14 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
   }
   var recievedList = recievedString.split(".");
   if (recievedList.length !== 6) {
-    alert("de code heeft te weinig of te veel punten '.' . Het moet lijken op bijvoorbeeld '1.2.3.4.5.6' . Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
+    alert("De code heeft een verkeer aantal getallen. Het moet lijken op bijvoorbeeld '1.2.3.4.5.6'. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.")
     return;
   }
   var confNum = 0;
   for (var i = 0; i < recievedList.length; i++) {
     recievedList[i] = parseInt(recievedList[i]);
     if (isNaN(recievedList[i])) {
-      alert("De code is ongeldig. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
+      alert("De code is ongeldig. Er is niks ontvangen. Probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.")
       return
     }
     if (i < 5) {
@@ -244,26 +245,26 @@ function recieve() { // otherID.transID.MyID.transType.amount.all+%7
     }
   }
   if (recievedList[0].toString === MyID) {
-    alert("Het lijkt er op dat je iets aan jezelf prpbeert te geven. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs");
+    alert("Het lijkt er op dat je iets aan jezelf probeert te geven. Er is niks ontvangen. Probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.");
     return;
   }
   var fTransID = recievedList[0].toString()+";"+recievedList[1].toString()
   if (recievedIDs.includes(fTransID)) {
-    alert("Deze code is al een keer ingevoerd. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
+    alert("Deze code is al een keer ingevoerd. Er is niks ontvangen. Probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.")
     return;
   }
   if (recievedList[2] !== parseInt(MyID)) {
-    alert("Deze code is niet voor jouw bedoeld. De code is ongeldig. Probeer het nog een keer of ga naar Thijs");
+    alert("Het lijkt er op dat deze code niet voor jouw gemaakt is. Probeer het opniew.");
     return;
   }
-  if (recievedList[3] > TotalThingCount) {
-    alert("Er wordt iets verkocht dat niet bestaat. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
+  if (recievedList[3] < 0 || recievedList[3] >= TotalThingCount) {
+    alert("Er wordt iets verkocht dat niet bestaat. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.")
     return;
   }
   confNum = getConfNum(confNum, ConfNumDepth);
   if (confNum != recievedList[5]) {
     console.log(confNum, recievedList[5]);
-    alert("De code is ongeldig. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. de verzender moet NIET op annuleren drukken, maar gewoon de code houden. Als dit vaak niet wertk, ga dan naar Thijs")
+    alert("De code is ongeldig. Er is niks ontvangen, probeer het opnieuw door opnieuw op ontvangen te drukken. De verzender moet NIET op annuleren drukken, maar gewoon de code houden.")
     return;
   }
   console.log(recievedList);
