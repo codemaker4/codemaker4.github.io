@@ -330,6 +330,7 @@ function lootChest() {
     alert("De kist had " + chestCode[2].toString() + " " + AllNames[chestCode[1]] + ".");
   } else if (chestCode[1] < AllNames.length) {
     buildings[chestCode[1]-Names.length] += chestCode[2];
+    alert("De kist had " + chestCode[2].toString() + " " + AllNames[chestCode[1]] + ".");
   } else {
     alert("De kist lijkt een niet bestaand item te hebben. Probeer het opnieuw.")
     return;
