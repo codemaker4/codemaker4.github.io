@@ -1,0 +1,157 @@
+:root {
+    --borderWidth: 0.4rem;
+    --headerHight: 5.4375rem;
+    --navWidth: 15rem
+}
+
+body {
+    background-color:#222;
+    color: #eee;
+    margin: 0;
+    padding: 0;
+    font-family: helvetica;
+}
+
+a {
+    color: #99f;
+}
+
+a:hover {
+    background-color: #444;
+}
+
+.center {
+    margin: auto;
+}
+
+div#mainHeaderContainer {
+    float: left;
+    border-style: solid;
+    border-color: #eee;
+    border-width: 0 0 var(--borderWidth) 0;
+    width: 100%;
+}
+
+header#mainHeader {
+    width: fit-content;
+    height: var(--headerHight);
+    margin: auto;
+}
+
+h1#mainHeader {
+    margin: 1rem 0 1rem 0;
+    float: left;
+    font-size: 3rem;
+}
+
+img#mainHeader {
+    float: left;
+    height: 100%;
+    margin-right: 2rem;
+}
+
+nav#mainNav {
+    float: left;
+    overflow-y: auto;
+    width: 100%;
+    border-style: solid;
+    border-color: #eee;
+    border-width: 0 0 var(--borderWidth) 0;
+}
+
+div#mainLinkContainer {
+    width: fit-content;
+    margin: auto;
+    padding: 1rem;
+}
+
+.navLink {
+    font-size: 2rem;
+    display: inline;
+    padding: 1rem;
+    width: fit-content;
+}
+
+div#mainBody {
+    float: left;
+    width: 100%;
+}
+
+div.postLayer {
+    float: left;
+    width: 100%;
+    margin: 0;
+    border-width: 0;
+    border-bottom-width: var(--borderWidth);
+    border-style: solid;
+    border-color: #eee;
+}
+
+div.postContainer {
+    /* width: fit-content; */
+    /* max-width: 90%; */
+    width: 90%;
+    overflow-y: auto;
+    margin: auto;
+}
+
+div.postTextHalf {
+    --rightMargin: 2rem;
+    width: calc(80% - var(--rightMargin));
+    margin-right: var(--rightMargin);
+    float: left;
+}
+
+div.postTextHalf > * {
+    width: 100%;
+    margin-right: 0;
+}
+
+div.postTextFull {
+    width: 100%;
+}
+
+div.postImageHalf {
+    float: left;
+    width: 20%;
+    padding: 2rem 0;
+}
+
+div.postImageHalf > * {
+    width: 100%;
+}
+
+iframe.postVideo {
+    width: min(100%, 560px);
+    height: 315px;
+}
+
+@media only screen and (min-width: 100vh) { /*pc*/
+    body {
+        overflow: hidden;
+    }
+    nav#mainNav {
+        width: calc(var(--navWidth) - var(--borderWidth));
+        height: calc(100vh - var(--headerHight));
+        border-width: 0 var(--borderWidth) 0 0;
+        overflow-y: auto;
+    }
+    div.postContainer {
+        max-width: 80%;
+    }
+    div#mainBody {
+        width: calc(100% - var(--navWidth));
+        height: calc(100vh - var(--headerHight));
+        overflow-y: auto;
+    }
+    div#mainLinkContainer {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+    .navLink {
+        display: block;
+        margin: 0 auto;
+        font-size: 1.5rem;
+    }
+}
