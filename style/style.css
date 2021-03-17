@@ -124,10 +124,6 @@ iframe.postVideo {
     height: 315px;
 }
 
-pre {
-    overflow-x: auto;
-}
-
 @media only screen and (min-width: 100vh) { /*pc*/
     body {
         overflow: hidden;
