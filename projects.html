@@ -24,10 +24,49 @@
     <div id="mainBody">
       <div class="postLayer">
         <div class="postContainer">
-          <div class="postTextFull">
-            <h2 class="mainBodyTitle">A void...</h2>
-            <p>The projects page is devoid of projects, for now...<br>
-            I am working on it, it will be here soon™.</p>
+          <div class="postTextHalf">
+            <h2 class="mainBodyTitle">2d math plotter</h2>
+            <a href="https://codemaker4.github.io/jsmath/" target="_blank">codemaker4.github.io/jsmath</a>
+            <p>JSmath is a 2d math plotter. Press 'E' to enter a JavaScript function that takes the inputs 'x' and 'y' and outputs a number between 0 and 255, making black to white colors apprear at cerain coordinates.<br>
+              You can pan around with the mouse, or use WASD to move around. Pressing and holding the + and - keys zooms in or out, and pressing q lets you redraw the screen with a given pixel size. Enter 1 to get the highest resolution, or 2 to get a decent but lower resolution image four times as fast.<br>
+              The function you enter after pressing 'E' can also output a boolean, or an array of 3 numbers for RGB colors. Here are some example functions:</p>
+              <pre><code>/* the default */ return x%y;</code></pre>
+              <pre><code>/* an exaple of using p5.js noise() */ return noise(x/100,y/100)*255;</code></pre>
+              <pre><code>/* the mandelbrot set */ var i=0; var cx=x/100; var cy=y/100; var zx=0; var zy=0; do { var xt=zx*zy; zx=zx*zx-zy*zy+cx; zy=2*xt+cy; i++; } while(i&lt;1000&&(zx*zx+zy*zy)&lt;4);if(i==1000){return 0;}  return [sin(i/127*PI*2)*127+127, sin((i/127*PI*2)+(PI*0.6))*127+127, sin((i/127*PI*2)+(PI*1.3))*127+127];</code></pre>
+          </div>
+          <div class="postImageHalf">
+            <img src="images/jsmath/xmody.png" alt="">
+            <img src="images/jsmath/mandelbrot.png" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="postLayer">
+        <div class="postContainer">
+          <div class="postTextHalf">
+            <h2 class="mainBodyTitle">Terrain generator</h2>
+            <a href="https://codemaker4.github.io/jsWorldGen/" target="_blank">codemaker4.github.io/jsWorldGen</a>
+            <p>I made a simple terrain generating program that also visualises the terrain. Blue colors are low terain or water, green is land at slightly above sea level, and red/brown land represents high mountains.<br>
+            You can move around by using WASD or by dragging with your mouse. This does also work on your phone, but it is kinda slow.<br>
+            It generates this terrain by first making a lot of points with a random position and height. Then, for each pixel, the program determines the height of the land on that pixel as a weighted average of the nearby points.<br>
+            But this is a slow algorithim, so to keep a decent framerate while moving around, the terrain is generated in chunks, beginning at a low resolution, and if the CPU has some time to spare, it will try to increase the resolution of existing chunks if they are on screen.</p>
+          </div>
+          <div class="postImageHalf">
+            <img src="images/jsworldgen/Screenshot.png" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="postLayer">
+        <div class="postContainer">
+          <div class="postTextHalf">
+            <h2 class="mainBodyTitle">Simple runner game</h2>
+            <a href="https://codemaker4.github.io/JSrunner/" target="_blank">codemaker4.github.io/JSrunner</a>
+            <p>So the first project that is worthy of being shown here is this runner game I made called JSrunner because it's a runner made in JavaScript and I could not think of a better name. The graphics are simplistic at best, and my English spelling skills were terrible back then, but it is still a nice piece of code.<br>
+            The main objective is to jump over obstacles and not hit them for as long as possible. You can jump with the spacebar or the upwards arrow on your keyboard, and simply clicking will also jump to make this game work on mobile devices.<br>
+            I also made a feature where you can customise the look of the obstacles. Just press 'o', paste a link to an online image and press ok. For some reason, the prompt doesn't dissapear properly because of some changes to how events work in p5.js, the library/game engine I used, but it also saves that link to localstorage, so just refresh the page and jump over cactusses instead of grey blocks.</p>
+          </div>
+          <div class="postImageHalf">
+            <img src="images/jsrunner/screenshot1.png" alt="">
+            <img src="images/jsrunner/death.png" alt="">
           </div>
         </div>
       </div>
