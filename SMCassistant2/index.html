@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="davidshimjs-qrcodejs-04f46c6/jquery.min.js"></script>
+    <script type="text/javascript" src="davidshimjs-qrcodejs-04f46c6/qrcode.js"></script>
+    <script src="programLib.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div class="program">
+      <textarea name="name" class="indexLines" id="indexLines" readonly>0</textarea>
+      <textarea name="name" class="symbCode" id="userCode">ya code</textarea>
+      <textarea name="name" class="binCode" id="compiledCode" readonly>compiled</textarea>
+      <div id="qrcode" style="width:500px; height:600px; float: left; margin:50px" onclick="window.open('error.html');"></div>
+    </div>
+    <div class="settings">
+      <div class="setting">
+        <p class="settingContent">lineStart:</p>
+        <input type="number" name="lineStart" id="lineStart" value="16" class="settingContent" min="0" max="63" onchange="lineStartChange();">
+      </div>
+      <button type="button" name="loadPrgmOS" class="setting" onclick="loadProgram('smcOS');">load program OS</button>
+      <button type="button" name="loadPrgmOS" class="setting" onclick="loadProgram('tinyOS');">load program tinyOS</button>
+      <button type="button" name="loadPrgmOS" class="setting" onclick="loadProgram('counter');">load program counter</button>
+    </div>
+  </body>
+  <script src="script.js" charset="utf-8"></script>
+</html>

@@ -1,0 +1,29 @@
+body {
+  margin: 0px;
+}
+.binaryCode {
+  width: 100%;
+  height: 50%;
+}
+
+.binaryDigit {
+  width: Calc(100%/8 - 10px);
+  height: Calc(60vh - 10px);
+  float: left;
+  border-style: solid;
+  border-color: grey;
+  border-width: 5px;
+  font-size: 10vw;
+  text-align: center;
+}
+
+.nextButton {
+  float: left;
+  width: Calc(100% - 10px);
+  height: Calc(40vh - 10px);
+  border-style: solid;
+  border-color: grey;
+  border-width: 5px;
+  font-size: 15vw;
+  text-align: center;
+}
