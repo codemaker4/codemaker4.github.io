@@ -26,25 +26,29 @@
         <div class="postContainer">
           <div class="postTextHalf">
             <h2 class="mainBodyTitle">2d math plotter</h2>
-            <a href="https://codemaker4.github.io/jsmath/" target="_blank">codemaker4.github.io/jsmath</a>
-            <p>JSmath is a 2d math plotter. Press 'E' to enter a JavaScript function that takes the inputs 'x' and 'y' and outputs a number between 0 and 255, representing black to white colors.<br>
-              You can pan around with the mouse, or use WASD to move around. Pressing and holding the + and - keys zooms in or out, and pressing q lets you redraw the screen with a given pixel size. Enter 1 to get the highest resolution, or 2 to get a decent but lower resolution image four times as fast.<br>
-              The function you enter after pressing 'E' can also output a boolean, or an array of 3 numbers for RGB colors. Here are some example functions:</p>
-              <code>
-                // the default<br>
-                return x%y;<br>
-                <br>
-                // an exaple of using p5.js noise()<br>
-                return noise(x/100,y/100)*255;<br>
-                <br>
-                // the mandelbrot set<br>
-                var i=0; var cx=x/100; var cy=y/100; var zx=0; var zy=0; do { var xt=zx*zy; zx=zx*zx-zy*zy+cx; zy=2*xt+cy; i++; } while(i&lt;1000&&(zx*zx+zy*zy)&lt;4);if(i==1000){return 0;}  return [sin(i/127*PI*2)*127+127, sin((i/127*PI*2)+(PI*0.6))*127+127, sin((i/127*PI*2)+(PI*1.3))*127+127];
-              </code>
-              <p>Pressing 'R' will let the program create a random function. Most of them are quite crap, but sometimes these random functions create interesting imgaes.</p>
+            <a href="https://codemaker4.github.io/codemakers_plotter/" target="_blank">https://codemaker4.github.io/codemakers_plotter</a>
+            <p>
+              Codemaker's Plotter is my JavaScript real-time math plotting project.<br>
+              The latest version, which is the fifth rewrite, uses multithreadding to utilise the full computing capacity of a users CPU. I also added a simple gui, and no longer use <code>prompt()</code> and <code>alert()</code>.<br>
+              
+              In the function input, you can give any JavaScript function. This function is executed for every pixel on the screen. It has an x and y input, and can output colors in various ways using booleans or numbers between 0 and 1.<br>
+              The idea is that this function would, based on it's position, create different colors. When many of these pixels are calculated next to eachother, mathematical patterns can emerge.<br>
+              By default, it shows the mandelbrot set at 1k iterations. You can adjust the iteration limit with the <code>maxI</code> variable.
+              <br>
+              The x and y inputs are the coordinates of the center of the view. The scale is how zoomed out the view is. So values &gt; 1 zoom out, and values &lt; 1 zoom in.<br>
+              <br>
+              You can also see more options by pressing the advanced button.<br>
+              Tasks are the amount of chunks that are being calculated, or are waiting to get a <span title="In JS, they are actually called workers">thread</span> assigned.<br>
+              Pix size is the current quality that is being worked on. If it is &gt; 1, the pixels being calculated are larger than the pixels of your monitor, and if it is &lt; 1, then multiple samples are being calculated per pixel for an anti-alias effect.<br>
+              What pixel sizes are being used, is determined by the Level Of Detail parameters. Basically, to calculate a pixel size, you do <code>LOD_power ^ current_LOD_number</code>, where LOD_power is a constant determining how much the quality changes per level, and the current_LOD_number is a integer that starts at the lod start input, and decreases by 1 every time the full image has been calculated at the current pixSize. To prevent your CPU from trying to calculate an infinitely fine LOD, there is also a lod end input that is the lowest value the current_LOD_power will reach.<br>
+              Also, the more negative the LOD end is, the higher the quality and the higher the computational load. So if you want to get finer details, set LOD end to a lower (possibly negative) integer, like -2, and if you want the first pass of the rendering to be at an even lower resolution, set the LOD start to a higher value. Finally, if you want to increase the step size, increase the lod power to a higher integer.<br>
+              <br>
+              Then there is the pixels per chunk input. It sets the maximum amount of pixels that can be in a single task. The lower this value, the more individual chunks there are, the more the seperate tasks will be flowing through the threads and the more control the queue system has over what thread does what calculations. But setting this to a too low value means that the computational cost of creating and managing too many individual tasks can outweigh the benefits. 10k pixels per tasks is a good value for me. In general, I advise making sure that the queue length does not exceed 50 tasks per thread.<br>
+              And lastly, there is the thread count. This determines how many workers are created. I advise setting this to the amount of threads your CPU can handle. (For win10 users, go to task manager -&gt; performance -&gt; CPU and look at the logical processors stat.) Creating more threads than your CPU can handle won't break the plotter, but will not increase performance either. Decreasing the thread count will cap the amount of CPU the plotter can use, which effectively is a battery saver mode.
+            </p>
           </div>
           <div class="postImageHalf">
-            <img src="images/jsmath/xmody.png" alt="">
-            <img src="images/jsmath/mandelbrot.png" alt="">
+            <img src="images/jsmath/MandelbrotZoomSize.png" alt="">
           </div>
         </div>
       </div>
