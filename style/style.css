@@ -1,19 +1,19 @@
 :root {
     --borderWidth: 0.4rem;
     --headerHight: 5.4375rem;
-    --navWidth: 15rem
+    --navWidth: 10rem
 }
 
 body {
     background-color:#222;
-    color: #eee;
+    color: #ccc;
     margin: 0;
     padding: 0;
     font-family: helvetica;
 }
 
 a {
-    color: #99f;
+    color: #79d
 }
 
 a:hover {
@@ -27,7 +27,7 @@ a:hover {
 div#mainHeaderContainer {
     float: left;
     border-style: solid;
-    border-color: #eee;
+    border-color: #888;
     border-width: 0 0 var(--borderWidth) 0;
     width: 100%;
 }
@@ -55,7 +55,7 @@ nav#mainNav {
     overflow-y: auto;
     width: 100%;
     border-style: solid;
-    border-color: #eee;
+    border-color: #888;
     border-width: 0 0 var(--borderWidth) 0;
 }
 
@@ -84,7 +84,7 @@ div.postLayer {
     border-width: 0;
     border-bottom-width: var(--borderWidth);
     border-style: solid;
-    border-color: #eee;
+    border-color: #888;
 }
 
 div.postContainer {
