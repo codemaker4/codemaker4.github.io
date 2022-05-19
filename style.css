@@ -1,0 +1,86 @@
+body {
+    background-color: #333;
+    color: #ccc;
+    margin: 0px;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    width: 100vw;
+}
+
+#header {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    height: 100vh;
+    width: 100vw;
+}
+
+#sideHeader {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 50% 20% 30%;
+    grid-template-columns: 100%;
+    margin: 0;
+}
+
+#sideHeader > img {
+    width: calc(min(40vh, 60vw));
+    margin: 5vh auto;
+}
+
+#sideHeader > h1 {
+    width: 100%;
+    font-size: calc(min(8vh, 10vw));
+    text-align: center;
+}
+
+#sideHeader #sloganContainer {
+    width: calc(min(60vh, 80vw));
+    margin: auto;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    text-align: center;
+}
+
+#sideHeader #sloganContainer img {
+    height: calc(min(4vh, 6vw));
+    margin: auto;
+}
+
+#sideHeader #sloganContainer a {
+    font-size: calc(min(2.5vh, 3.75vw));
+    color: #ccc;
+    text-decoration: none;
+}
+
+#shortDesc {
+    width: 100%;
+    height: 100%;
+}
+
+#shortDesc p {
+    margin: 0;
+    padding: 10vh;
+    padding-left: 0vh;
+    width: 70%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3vh
+}
+
+@media (max-aspect-ratio: 4/3) {
+    #header {
+        grid-template-columns: 100%;
+        grid-template-rows: 100% auto;
+        max-height: 150vw;
+    }
+
+    #shortDesc p {
+        padding: 10vh;
+        width: 80%;
+        max-width: calc(100vw - 20vh);
+    }
+}
