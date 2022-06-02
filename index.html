@@ -35,5 +35,42 @@
         </p>
       </div>
     </div>
+    <div id="projectHeader">
+      <h1>PROJECTS</h1>
+    </div>
+    <div id="projectContainer">
+      <div class="project">
+        <h2>Real time JavaScript function plotter</h2>
+        <p>
+          <a href="https://codemaker4.github.io/codemakers_plotter/" target="_blank">Codemaker's Plotter</a> is my JavaScript real-time math plotting project.<br>
+          <img src="images/MandelbrotZoomSize.png" alt="">
+          It takes a JavaScript function as input, and plots the output of that function on the screen. It does this by executing the function for every pixel on the screen. The reason this can be done in real time is because of a dynamic resolution and because it uses multiple threads to render everything.<br>
+          Sadly, it can't make use of the GPU because the functions are in JavaSctipt, and compiling that to webGL isn't really practical. JS was a bit of an arbritary choice, bit it is fast enough like this.<br>
+          By default, the function will draw the Mandelbort set. But this plotter is capable of drawing any f(x,y) that outputs a color, number or boolean. Try this for example:
+          <code>return x**2 + y**2 &lt; 1 && x**2 &gt; y/2</code>
+          This function first creates a white circle with radius of 1, and then takes a bite out of it in the shape of the quadratic function y/2 = x^2.<br>
+          But I also added some utility functions, and you can return an RGB array of booleans or numbers to create color. This last example demonstrates this:
+          <code>
+            return [<br>
+            axis(x,y,pixSize*5) || grid(x,y,pixSize*2, 100), // create a thick axis, with thinner lines in red.<br>
+            line((x) => x**2, x, y, pixSize*5), // draw a line where y = x**2 in green.<br>
+            equal((x,y) => Math.sqrt(x**2 + y**2), (x,y) => 2, x, y, pixSize*5) // draw a line where the distance from the origin is equal to 2 in blue.<br>
+            ]<br>
+          </code>
+          <img src="images/PlotterColorLines.png" alt="">
+          I still want to add axis as a defualt overlay, instead of a part of the input function. That way it is also easier to know what location you are looking at, and it will probably also be faster than the current in-function approach.
+        </p>
+      </div>
+      <div class="project">
+        <h2>Programmable computer using in-game logic</h2>
+        <p>
+          <a href="https://youtu.be/y7OXu7YDpY8" target="_blank">My first YouTube video</a> is that of a simple computer made in a video-game called <a href="https://store.steampowered.com/app/387990/Scrap_Mechanic/" target="_blank">Scrap Mechanic</a>. The game features the basic logic gates (and, or, xor and the inverted variants) and allows you to connect them together to automate contraptions. Logic isn't the main selling point of the game, but still is quite powerful.<br>
+          To my knowledge this is the very first published programmable computer made in Scrap Mechanic, and my YouTube video has inspired many others to build their own computers.<br>
+          At the time I was 14 years old, and I built it in a single weekend. Though this short build time is mostly because of the computer's simplicity and because I had been thinking about how it would work for a week or two prior to actually building it.<br>
+          The computer doesn't really have an instruction set. Instead, it only has one instruction: copy. This instruction copies the data from one of the sixteen registers to a different one. The trick is that some of these registers are connected to the components of the computer, so the first register is one of the inputs for the ALU, and another register is connected to the program counter allowing for jumping in your program. This single instruction architecture is very easy to build and modify/upgrade, especially with the spudgun/switch approach.            
+        </p>
+        <img src="images/SMC1.jpg" alt="">
+      </div>
+    </div>
   </body>
 </html>
