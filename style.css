@@ -1,11 +1,20 @@
 body {
-    background-color: #333;
+    /* background-color: #333; */
     color: #ccc;
     margin: 0px;
     min-height: 100%;
     font-family: Arial, Helvetica, sans-serif;
     position: relative;
     overflow-x: hidden;
+}
+
+#fixedBackground {
+    background: linear-gradient(129deg, #0e3358, #1a0c3c);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    float: left;
+    z-index: -100;
 }
 
 #header {
