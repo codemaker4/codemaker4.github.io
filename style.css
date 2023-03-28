@@ -9,12 +9,26 @@ body {
 }
 
 #fixedBackground {
-    background: linear-gradient(129deg, #0f0c97, #51004f);
+    background: linear-gradient(129deg, #172d82, #40024d);
     width: 100vw;
     height: 100vh;
     position: fixed;
+    top: 0;
     float: left;
     z-index: -100;
+}
+
+#backToHome {
+    height: 10vh;
+    z-index: 100;
+    position: fixed;
+    top: 2vh;
+    left: 2vh;
+    transition: all 0.3s ease-in-out;
+}
+
+#backToHome:hover {
+    transform: scale(1.1);
 }
 
 #header {
@@ -61,6 +75,12 @@ body {
     color: #fff;
     text-decoration: none;
     flex-grow: 1;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+#sideHeader #sloganContainer a:hover {
+    transform: scale(1.1);
 }
 
 #shortDesc {
@@ -93,22 +113,65 @@ body {
 }
 
 #projectContainer {
-    width: 100%;
+    width: 80%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 50% 50%;
 }
 
-.project {
-    width: 70%;
-    margin: auto;
+.projectThumbnail {
+    width: 60%;
+    height: calc(50vh - 4vw);
+    margin: 2vw;
+    padding: 0 5vw 0 5vw;
+    background-clip: border-box;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: multiply;
+    border-radius: 5vh;
+    overflow-y: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
 }
 
-.project + .project {
-    margin-top: 20vh;
+.projectThumbnail:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
 }
 
-.project h2 {
+.projectThumbnail h2 {
     font-size: calc(min(6vh, 8vw));
     text-align: center;
     width: 100%;
+}
+
+#projectBanner {
+    width: 100%;
+    padding-top: 70vh;
+    margin: 0;
+    background-size: cover;
+    background-position: center;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,1) 60%, rgba(0,0,0,0));
+    position: relative;
+    z-index: -50;
+}
+
+#projectBanner + h2 {
+    margin: -2em auto 1em auto;
+    width: 60%;
+    font-size: calc(min(9vh, 12vw));
+    text-align: center;
+}
+
+.project {
+    width: 60%;
+    margin: 0 auto;
 }
 
 .project h3 {
@@ -121,7 +184,7 @@ body {
     font-size: calc(min(2.5vh, 3.75vw));
 }
 
-.project img {
+.project img,.project iframe {
     margin: 1em auto;
     max-height: 50vh;
     max-width: 100%;
@@ -141,12 +204,8 @@ body {
 }
 
 .project a {
-    color: #0bd;
+    color: #3be1ff;
     text-decoration: none;
-}
-
-.project a:visited {
-    color: #09b;
 }
 
 .project a:hover {
@@ -193,7 +252,13 @@ body {
         width: 90%;
     }
 
-    .project {
-        width: 90%;
+    #projectContainer {
+        grid-template-columns: 100%;
+        width: 100%;
+    }
+
+    .projectThumbnail {
+        margin: 2vw auto;
+        width: 80%;
     }
 }
