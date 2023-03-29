@@ -261,4 +261,12 @@ body {
         margin: 2vw auto;
         width: 80%;
     }
+
+    #projectBanner + h2 {
+        width: 80%;
+    }
+    
+    .project {
+        width: 80%;
+    }
 }
