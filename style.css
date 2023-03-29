@@ -9,7 +9,7 @@ body {
 }
 
 #fixedBackground {
-    background: linear-gradient(129deg, #172d82, #40024d);
+    background: linear-gradient(129deg, #172d82, #51004f);
     width: 100vw;
     height: 100vh;
     position: fixed;
