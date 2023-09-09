@@ -88,6 +88,15 @@ body {
     height: 100%;
 }
 
+#shortDesc a {
+    color: #3be1ff;
+    text-decoration: none;
+}
+
+#shortDesc a:hover {
+    text-decoration: underline;
+}
+
 #shortDesc p {
     margin: 0;
     padding: 10vh;
